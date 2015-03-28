@@ -22,13 +22,18 @@ int generateRandomRgb() {
 }
 
 void file(void) {
-    ifstream arq("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/aula03/TestCpp/TestCpp/bola0.ppm");
+    
+//    ifstream arq("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/bola0.ppm");
+    ifstream arq("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/bola0.ptm");
+
     char BUFFER[256];
     arq >> BUFFER;
     
     if (BUFFER[1] == '3') {
+        printf("Modo texto\n");
         // modo texto
     } else {
+        printf("Modo binário\n");
         // modo binário
     }
     
@@ -36,20 +41,29 @@ void file(void) {
     if (BUFFER[0] == '#') {
         // descartar a linha de comentário
         arq.getline(BUFFER, 256);
-        arq >> BUFFER;
     }
     
     int w, h, max;
     arq >> w >> h;
     arq >> max;
     
+    printf("w: %d, h: %d, max value: %d\n", w, h, max);
+    
+    Image *image = new Image(w, h);
+    
     for (int i = 0; i < w * h; i++) {
-        int r, g, b;
-        arq >> r >> g >> b;
-        
-        // setar os pixels da imagem
-        
+
+        int a, r, g, b;
+        arq >> a >> r >> g >> b;
+        int x = i % w;
+        int y = i / w;
+        int pixel = (a << 24) | (r << 16) | (g << 8) | b;
+        image->setPixels(pixel, x, y);
     }
+    
+    glDrawPixels(image->getWidth(), image->getHeight(), GL_BGRA_EXT, GL_UNSIGNED_BYTE, image->getPixels());
+    
+    glFlush();
     
 }
 

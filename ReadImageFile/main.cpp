@@ -22,14 +22,14 @@ int generateRandomRgb() {
 }
 
 void file(void) {
-    
-//    ifstream arq("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/bola0.ppm");
-    ifstream arq("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/bola0.ptm");
+
+//    ifstream arq("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/bola/bolaAnimadaPTM_T0.ptm");
+    ifstream arq("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/bola/bolaAnimadaPTM_T5.ptm");
 
     char BUFFER[256];
     arq >> BUFFER;
     
-    if (BUFFER[1] == '3') {
+    if (BUFFER[1] == '3' || BUFFER[1] == '7') {
         printf("Modo texto\n");
         // modo texto
     } else {
@@ -37,11 +37,12 @@ void file(void) {
         // modo binário
     }
     
-    arq >> BUFFER;
-    if (BUFFER[0] == '#') {
-        // descartar a linha de comentário
-        arq.getline(BUFFER, 256);
-    }
+    // se tivesse linha de comentário, usar algo como
+//    arq >> BUFFER;
+//    if (BUFFER[0] == '#') {
+//        // descartar a linha de comentário
+//        arq.getline(BUFFER, 256);
+//    }
     
     int w, h, max;
     arq >> w >> h;
@@ -60,6 +61,7 @@ void file(void) {
         int pixel = (a << 24) | (r << 16) | (g << 8) | b;
         image->setPixels(pixel, x, y);
     }
+    glRasterPos2d(0.5, 0.5);
     
     glDrawPixels(image->getWidth(), image->getHeight(), GL_BGRA_EXT, GL_UNSIGNED_BYTE, image->getPixels());
     
@@ -68,10 +70,10 @@ void file(void) {
 }
 
 void display(void) {
+    glClear(GL_COLOR_BUFFER_BIT);
+
     file();
     return;
-    
-    glClear(GL_COLOR_BUFFER_BIT);
     
     int w = 640;
     int h = 480;

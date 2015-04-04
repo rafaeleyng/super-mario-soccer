@@ -20,6 +20,7 @@ public:
     }
     void setPixels(int rgb, int x, int y) {
         pixels[(y * width) + x] = rgb;
+//        printf("x: %d, y: %d\n", x, y);
     }
     int getPixel(int x, int y) {
         return pixels[(y * width) + x];
@@ -33,8 +34,17 @@ public:
     int *getPixels() {
         return pixels;
     }
-    void plot(Image *image) {
-        printf("ploting");
+    void plot(Image *image, int xStart, int yStart) {
+        for (int i = 0; i < image->getWidth() * image->getHeight(); i++) {
+            int x = i % image->getWidth();
+            int y = i / image->getWidth();
+            int pixel = image->getPixel(x, y);
+            x += xStart;
+            y += yStart;
+            if (x <= this->getWidth() && y <= this->getHeight()) {
+                this->setPixels(pixel, x, y);
+            }
+        }
     }
     
 private:

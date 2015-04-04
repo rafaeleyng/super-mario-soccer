@@ -16,6 +16,8 @@ using namespace std;
 int frame = 0;
 Image *balls[7];
 Image *field;
+int screenW = 450;
+int screenH = 430;
 
 int generateRandomRgb() {
     int r = rand() * 255;
@@ -25,14 +27,24 @@ int generateRandomRgb() {
     return rgb;
 }
 
-void play(int value) {
-//    glRasterPos2d(0.5, 0.5);
+Image* plotStuff() {
     Image *ball = balls[frame%7];
-    glDrawPixels(field->getWidth(), field->getHeight(), GL_BGRA_EXT, GL_UNSIGNED_BYTE, field->getPixels());
-    glDrawPixels(ball->getWidth(), ball->getHeight(), GL_BGRA_EXT, GL_UNSIGNED_BYTE, ball->getPixels());
+    
+    Image *result = new Image(screenW, screenH);
+    
+    result->plot(field, 0, 0);
+    result->plot(ball, 0, frame*5);
+    
+    return result;
+}
+
+void play(int value) {
+    //    glRasterPos2d(0.5, 0.5);
+    Image *resultImage = plotStuff();
+    glDrawPixels(resultImage->getWidth(), resultImage->getHeight(), GL_BGRA_EXT, GL_UNSIGNED_BYTE, resultImage->getPixels());
     glFlush();
     frame++;
-    glutTimerFunc(100, play, 1);
+    glutTimerFunc(50, play, 1);
     
 }
 
@@ -92,9 +104,8 @@ void init (void)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluOrtho2D(0.0, 1.0, 0.0, 1.0);
-    glViewport(0, 0, 640, 480);
+    glViewport(0, 0, 450, 430);
     
-    srand(time(NULL));
     loadImages();
 }
 

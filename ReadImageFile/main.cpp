@@ -14,7 +14,9 @@
 using namespace std;
 
 int frame = 0;
-Image *balls[7];
+Image *ballsB[7];
+Image *ballsM[7];
+Image *ballsS[7];
 Image *field;
 int screenW = 450;
 int screenH = 430;
@@ -27,9 +29,20 @@ int generateRandomRgb() {
     return rgb;
 }
 
+Image* getBallSprite() {
+    Image *ball;
+    if (frame < 33) {
+        ball = ballsB[frame%7];
+    } else if (frame < 67) {
+        ball = ballsM[frame%7];
+    } else {
+        ball = ballsS[frame%7];
+    }
+    return ball;
+}
+
 Image* plotStuff() {
-    Image *ball = balls[frame%7];
-    
+    Image *ball = getBallSprite();
     Image *result = new Image(screenW, screenH);
     
     result->plot(field, 0, 0);
@@ -48,7 +61,7 @@ void play(int value) {
     
 }
 
-Image* loadImage(char *path) {
+Image* loadImage(char const *path) {
     ifstream arq(path);
     char BUFFER[256];
     arq >> BUFFER;
@@ -85,14 +98,33 @@ void loadImages() {
     // field
     field = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/field.ptm");
     
-    // balls
-    balls[0] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/bola/bolaAnimadaPTM_T0.ptm");
-    balls[1] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/bola/bolaAnimadaPTM_T1.ptm");
-    balls[2] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/bola/bolaAnimadaPTM_T2.ptm");
-    balls[3] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/bola/bolaAnimadaPTM_T3.ptm");
-    balls[4] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/bola/bolaAnimadaPTM_T4.ptm");
-    balls[5] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/bola/bolaAnimadaPTM_T5.ptm");
-    balls[6] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/bola/bolaAnimadaPTM_T6.ptm");
+    // balls big
+    ballsB[0] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballB/ball0.ptm");
+    ballsB[1] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballB/ball1.ptm");
+    ballsB[2] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballB/ball2.ptm");
+    ballsB[3] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballB/ball3.ptm");
+    ballsB[4] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballB/ball4.ptm");
+    ballsB[5] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballB/ball5.ptm");
+    ballsB[6] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballB/ball6.ptm");
+
+    // balls medium
+    ballsM[0] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballM/ball0.ptm");
+    ballsM[1] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballM/ball1.ptm");
+    ballsM[2] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballM/ball2.ptm");
+    ballsM[3] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballM/ball3.ptm");
+    ballsM[4] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballM/ball4.ptm");
+    ballsM[5] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballM/ball5.ptm");
+    ballsM[6] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballM/ball6.ptm");
+
+    // balls small
+    ballsS[0] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballS/ball0.ptm");
+    ballsS[1] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballS/ball1.ptm");
+    ballsS[2] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballS/ball2.ptm");
+    ballsS[3] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballS/ball3.ptm");
+    ballsS[4] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballS/ball4.ptm");
+    ballsS[5] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballS/ball5.ptm");
+    ballsS[6] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballS/ball6.ptm");
+
 }
 
 void init (void)

@@ -20,7 +20,6 @@ public:
     }
     void setPixels(int rgb, int x, int y) {
         pixels[(y * width) + x] = rgb;
-//        printf("x: %d, y: %d\n", x, y);
     }
     int getPixel(int x, int y) {
         return pixels[(y * width) + x];
@@ -41,7 +40,12 @@ public:
             int pixel = image->getPixel(x, y);
             x += xStart;
             y += yStart;
-            if (x <= this->getWidth() && y <= this->getHeight()) {
+            int a = (pixel >> 24) & 0x100;
+            int r = (pixel >> 16) & 0x100;
+            int g = (pixel >> 8) & 0x100;
+            int b = pixel & 0x100;
+            // TODO - calcular o alpha de verdade
+            if (a != 0 && (x < this->getWidth() && y < this->getHeight())) {
                 this->setPixels(pixel, x, y);
             }
         }

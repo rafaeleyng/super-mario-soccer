@@ -13,6 +13,10 @@
 
 using namespace std;
 
+int frame = 0;
+Image *balls[7];
+Image *field;
+
 int generateRandomRgb() {
     int r = rand() * 255;
     int g = rand() * 255;
@@ -21,74 +25,62 @@ int generateRandomRgb() {
     return rgb;
 }
 
-void file(void) {
+void play(int value) {
+//    glRasterPos2d(0.5, 0.5);
+    Image *ball = balls[frame%7];
+    glDrawPixels(field->getWidth(), field->getHeight(), GL_BGRA_EXT, GL_UNSIGNED_BYTE, field->getPixels());
+    glDrawPixels(ball->getWidth(), ball->getHeight(), GL_BGRA_EXT, GL_UNSIGNED_BYTE, ball->getPixels());
+    glFlush();
+    frame++;
+    glutTimerFunc(100, play, 1);
+    
+}
 
-//    ifstream arq("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/bola/bolaAnimadaPTM_T0.ptm");
-    ifstream arq("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/bola/bolaAnimadaPTM_T5.ptm");
-
+Image* loadImage(char *path) {
+    ifstream arq(path);
     char BUFFER[256];
     arq >> BUFFER;
     
     if (BUFFER[1] == '3' || BUFFER[1] == '7') {
-        printf("Modo texto\n");
-        // modo texto
+//        printf("Modo texto\n");
     } else {
-        printf("Modo binário\n");
-        // modo binário
+//        printf("Modo binário\n");
     }
-    
-    // se tivesse linha de comentário, usar algo como
-//    arq >> BUFFER;
-//    if (BUFFER[0] == '#') {
-//        // descartar a linha de comentário
-//        arq.getline(BUFFER, 256);
-//    }
     
     int w, h, max;
     arq >> w >> h;
     arq >> max;
     
-    printf("w: %d, h: %d, max value: %d\n", w, h, max);
-    
     Image *image = new Image(w, h);
-    
     for (int i = 0; i < w * h; i++) {
-
         int a, r, g, b;
         arq >> a >> r >> g >> b;
         int x = i % w;
         int y = i / w;
+        y = h - y - 1; // inverte o y
         int pixel = (a << 24) | (r << 16) | (g << 8) | b;
         image->setPixels(pixel, x, y);
     }
-    glRasterPos2d(0.5, 0.5);
-    
-    glDrawPixels(image->getWidth(), image->getHeight(), GL_BGRA_EXT, GL_UNSIGNED_BYTE, image->getPixels());
-    
-    glFlush();
-    
+    return image;
 }
 
 void display(void) {
     glClear(GL_COLOR_BUFFER_BIT);
+    play(1);
+}
 
-    file();
-    return;
+void loadImages() {
+    // field
+    field = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/field.ptm");
     
-    int w = 640;
-    int h = 480;
-    
-    Image *image = new Image(w, h);
-    
-    for (int i = 0; i < w * h; i++) {
-        int x = i % w;
-        int y = i / w;
-        image->setPixels(generateRandomRgb(), x, y);
-    }
-    
-    glDrawPixels(image->getWidth(), image->getHeight(), GL_BGRA_EXT, GL_UNSIGNED_BYTE, image->getPixels());
-    
-    glFlush();
+    // balls
+    balls[0] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/bola/bolaAnimadaPTM_T0.ptm");
+    balls[1] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/bola/bolaAnimadaPTM_T1.ptm");
+    balls[2] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/bola/bolaAnimadaPTM_T2.ptm");
+    balls[3] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/bola/bolaAnimadaPTM_T3.ptm");
+    balls[4] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/bola/bolaAnimadaPTM_T4.ptm");
+    balls[5] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/bola/bolaAnimadaPTM_T5.ptm");
+    balls[6] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/bola/bolaAnimadaPTM_T6.ptm");
 }
 
 void init (void)
@@ -103,6 +95,7 @@ void init (void)
     glViewport(0, 0, 640, 480);
     
     srand(time(NULL));
+    loadImages();
 }
 
 int main(int argc, char** argv)

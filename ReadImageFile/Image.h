@@ -33,6 +33,9 @@ public:
     int *getPixels() {
         return pixels;
     }
+    void plot(Image *image) {
+        printf("ploting");
+    }
     
 private:
     int *pixels;

@@ -22,12 +22,9 @@ int adjustBallX;
 double ballX = 360;
 int screenW = 800;
 int screenH = 717;
-const double originalT = 100;
-//int numberOfInstants = 100;
-//double t = numberOfInstants;
 
 double originalDistance = 100;
-double currentDistance = 100;
+double currentDistance = originalDistance;
 
 int velocidade = 100;
 int horizontY = 240;
@@ -55,6 +52,7 @@ const int KEY_DOWN = 115; // s
 const int KEY_LEFT = 97; // a
 
 // images
+Image *arrow;
 Image *optionDirection;
 Image *optionHeight;
 Image *optionStrength;
@@ -74,15 +72,26 @@ Image *barrierL1;
 Image *barrierR0;
 Image *barrierR1;
 
+void startNewGame() {
+    printf("start new game");
+    currentDistance = originalDistance;
+}
+
+void resetOptions() {
+    OPTIONS_VALUES[0] = 1;
+    OPTIONS_VALUES[1] = 1;
+    OPTIONS_VALUES[2] = 1;
+}
+
 double getSpeed() {
     int optionValue = OPTIONS_VALUES[OPTION_STRENGTH];
     if (optionValue == 0) {
-        return 0.5;
-    }
-    if (optionValue == 1) {
         return 1.0;
     }
-    return 2.0;
+    if (optionValue == 1) {
+        return 2.0;
+    }
+    return 3.0;
 }
 
 double getAngle() {
@@ -186,9 +195,10 @@ Image* getGameImage() {
     result->plot(field, 0, 0);
     result->plot(goalkeeperL, 300, horizontY + 20);
     result->plot(barrierL0, 100, 180);
-    result->plot(barrierL1, 200, 180);
     result->plot(barrierR0, 300, 180);
-    result->plot(barrierR1, 400, 180);
+    
+    //    result->plot(barrierL1, 200, 180);
+    //    result->plot(barrierR1, 400, 180);
     
     result->plot(ball, calcBallX() + adjustBallX, calcBallY());
     
@@ -196,6 +206,8 @@ Image* getGameImage() {
 }
 
 Image* getOptionsImage() {
+//    resetOptions();
+    
     Image *optionsImage = new Image(screenW, 70);
     for (int i = 0; i < optionsImage->getHeight() * optionsImage->getWidth(); i++) {
         int a = 255, r = 0, g = 0, b = 0;
@@ -205,17 +217,34 @@ Image* getOptionsImage() {
         optionsImage->setPixels(pixel, x, y);
     }
     
-    int labelY = 10;
     // plot option labels
-    optionsImage->plot(optionDirection, 10, labelY);
-    optionsImage->plot(optionHeight, 210, labelY);
-    optionsImage->plot(optionStrength, 410, labelY);
+    int optionLabelY = 30;
+    int labelSpacing = 200;
+    int label0X = 50;
+    int label1X = label0X + optionDirection->getWidth() + labelSpacing;
+    int label2X = label1X + optionHeight->getWidth() + labelSpacing;
+    optionsImage->plot(optionDirection, label0X, optionLabelY);
+    optionsImage->plot(optionHeight, label1X, optionLabelY);
+    optionsImage->plot(optionStrength, label2X, optionLabelY);
     
     // plot option values
-    optionsImage->plot(optionsDirection[OPTIONS_VALUES[OPTION_DIRECTION]], 110, labelY);
-    optionsImage->plot(optionsHeight[OPTIONS_VALUES[OPTION_HEIGHT]], 310, labelY);
-    optionsImage->plot(optionsStrength[OPTIONS_VALUES[OPTION_STRENGTH]], 460, labelY);
+    int optionValueY = 10;
+    int margin = 20;
+    optionsImage->plot(optionsDirection[OPTIONS_VALUES[OPTION_DIRECTION]], label0X + optionDirection->getWidth() + margin, optionValueY);
+    optionsImage->plot(optionsHeight[OPTIONS_VALUES[OPTION_HEIGHT]], label1X + optionHeight->getWidth() + margin, optionValueY);
+    optionsImage->plot(optionsStrength[OPTIONS_VALUES[OPTION_STRENGTH]], label2X + optionStrength->getWidth() + margin, optionValueY);
     
+    // selected option arrow
+    int arrowX;
+    if (CURRENT_OPTION == 0) {
+        arrowX = label0X;
+    } else if (CURRENT_OPTION == 1) {
+        arrowX = label1X;
+    } else if (CURRENT_OPTION == 2) {
+        arrowX = label2X;
+    }
+    arrowX -= arrow->getWidth() + 5;
+    optionsImage->plot(arrow, arrowX, optionLabelY - 4);
     
     return optionsImage;
 }
@@ -275,7 +304,6 @@ Image* loadImage(char const *path) {
 }
 
 void display(void) {
-//    double currentDistance = originalDistance;
     glClear(GL_COLOR_BUFFER_BIT);
 
     switch (GAME_STATE) {
@@ -288,6 +316,7 @@ void display(void) {
             break;
         }
         case GAME_STATE_PLAYING: {
+            startNewGame();
             play(1);
             break;
         }
@@ -301,6 +330,7 @@ void display(void) {
 
 void loadImages() {
     // options
+    arrow = loadImage("options/arrow.ptm");
     optionDirection = loadImage("options/direction.ptm");
     optionHeight = loadImage("options/height.ptm");
     optionStrength = loadImage("options/strength.ptm");
@@ -404,6 +434,7 @@ void keyboard(unsigned char key, int x, int y) {
 
 void init (void)
 {
+    resetOptions(); // TODO tirar daqui
     glClearColor(1, 1, 1, 1);
     
     /*  initialize viewing values  */

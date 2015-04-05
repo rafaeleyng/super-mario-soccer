@@ -1,8 +1,8 @@
 //
 //  main.cpp
-//  ReadImageFile
+//  SuperMarioSoccer
 //
-//  Created by Rafael Eyng on 3/28/15.
+//  Created by Rafael Eyng on 4/5/15.
 //  Copyright (c) 2015 Rafael Eyng. All rights reserved.
 //
 
@@ -15,7 +15,7 @@
 #define PI 3.1415926535898
 using namespace std;
 
-const char *IMAGES_PATH = "/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/";
+const char *IMAGES_PATH = "/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/SuperMarioSoccer/SuperMarioSoccer/img/";
 int frame = 0;
 const int numberOfBalls = 4;
 int adjustBallX;
@@ -119,12 +119,12 @@ double getLateralDisplacement() {
 
 int calcBallY() {
     // TODO implementar a balística de verdade
-//    double x, y, g = 9.8;
-//    double angulo = 30.0;
-//    double a = angulo / 180 * PI;
-//    x = velocidade * cos(a) * t;
-//    y = v * sin(a) * ( (x / velocidade) * cos(a) ) - ( (g*x*x) / 2*(v*v * cos(a) * cos(a) ) );
-//    t += 0.1;
+    //    double x, y, g = 9.8;
+    //    double angulo = 30.0;
+    //    double a = angulo / 180 * PI;
+    //    x = velocidade * cos(a) * t;
+    //    y = v * sin(a) * ( (x / velocidade) * cos(a) ) - ( (g*x*x) / 2*(v*v * cos(a) * cos(a) ) );
+    //    t += 0.1;
     
     // TODO essa implementação é fake
     double startHeight = 90;
@@ -150,7 +150,7 @@ int calcBallY() {
         
         height = heightRatio * heightToGain;
         height += minHeightOnFall;
-
+        
     }
     
     return height;
@@ -206,7 +206,7 @@ Image* getGameImage() {
 }
 
 Image* getOptionsImage() {
-//    resetOptions();
+    //    resetOptions();
     
     Image *optionsImage = new Image(screenW, 70);
     for (int i = 0; i < optionsImage->getHeight() * optionsImage->getWidth(); i++) {
@@ -305,7 +305,7 @@ Image* loadImage(char const *path) {
 
 void display(void) {
     glClear(GL_COLOR_BUFFER_BIT);
-
+    
     switch (GAME_STATE) {
         case GAME_STATE_INITIAL: {
             Image *gameImage = getGameImage();
@@ -320,12 +320,12 @@ void display(void) {
             play(1);
             break;
         }
-
+            
         case GAME_STATE_END: {
             break;
         }
     }
-
+    
 }
 
 void loadImages() {
@@ -353,7 +353,7 @@ void loadImages() {
     barrierL1 = loadImage("enemies/barrierL1.ptm");
     barrierR0 = loadImage("enemies/barrierR0.ptm");
     barrierR1 = loadImage("enemies/barrierR1.ptm");
-
+    
     // goalkeeper
     goalkeeperL = loadImage("enemies/goalkeeperL.ptm");
     goalkeeperR = loadImage("enemies/goalkeeperR.ptm");
@@ -363,13 +363,13 @@ void loadImages() {
     ballsL[1] = loadImage("ballL/ball1.ptm");
     ballsL[2] = loadImage("ballL/ball2.ptm");
     ballsL[3] = loadImage("ballL/ball3.ptm");
-
+    
     // balls medium
     ballsM[0] = loadImage("ballM/ball0.ptm");
     ballsM[1] = loadImage("ballM/ball1.ptm");
     ballsM[2] = loadImage("ballM/ball2.ptm");
     ballsM[3] = loadImage("ballM/ball3.ptm");
-
+    
     // balls small
     ballsS[0] = loadImage("ballS/ball0.ptm");
     ballsS[1] = loadImage("ballS/ball1.ptm");
@@ -394,7 +394,7 @@ void handleOptions(int key) {
     } else if (key == KEY_DOWN) {
         OPTIONS_VALUES[CURRENT_OPTION]--;
     }
-//    printf("Options: %d, %d, %d\n", OPTIONS_VALUES[0], OPTIONS_VALUES[1], OPTIONS_VALUES[2]);
+    //    printf("Options: %d, %d, %d\n", OPTIONS_VALUES[0], OPTIONS_VALUES[1], OPTIONS_VALUES[2]);
 }
 
 void keyboard(unsigned char key, int x, int y) {

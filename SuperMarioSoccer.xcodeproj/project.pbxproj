@@ -7,14 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		534B962E1AC71C1000E7A3A1 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 534B962D1AC71C1000E7A3A1 /* main.cpp */; };
-		534B96351AC71C2200E7A3A1 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 534B96341AC71C2200E7A3A1 /* OpenGL.framework */; };
-		534B96371AC71C2900E7A3A1 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 534B96361AC71C2900E7A3A1 /* GLUT.framework */; };
-		534B963A1AC71C5100E7A3A1 /* Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 534B96381AC71C5100E7A3A1 /* Image.cpp */; };
+		53B524661AD1CA3300AAA21C /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53B524651AD1CA3300AAA21C /* main.cpp */; };
+		53B5246D1AD1CA4000AAA21C /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53B5246C1AD1CA4000AAA21C /* GLUT.framework */; };
+		53B5246F1AD1CA4600AAA21C /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53B5246E1AD1CA4600AAA21C /* OpenGL.framework */; };
+		53B524721AD1CA6900AAA21C /* Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53B524701AD1CA6900AAA21C /* Image.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		534B96281AC71C1000E7A3A1 /* CopyFiles */ = {
+		53B524601AD1CA3300AAA21C /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -26,120 +26,120 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		534B962A1AC71C1000E7A3A1 /* ReadImageFile */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ReadImageFile; sourceTree = BUILT_PRODUCTS_DIR; };
-		534B962D1AC71C1000E7A3A1 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		534B96341AC71C2200E7A3A1 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
-		534B96361AC71C2900E7A3A1 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
-		534B96381AC71C5100E7A3A1 /* Image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Image.cpp; sourceTree = "<group>"; };
-		534B96391AC71C5100E7A3A1 /* Image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Image.h; sourceTree = "<group>"; };
+		53B524621AD1CA3300AAA21C /* SuperMarioSoccer */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SuperMarioSoccer; sourceTree = BUILT_PRODUCTS_DIR; };
+		53B524651AD1CA3300AAA21C /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		53B5246C1AD1CA4000AAA21C /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
+		53B5246E1AD1CA4600AAA21C /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		53B524701AD1CA6900AAA21C /* Image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Image.cpp; sourceTree = "<group>"; };
+		53B524711AD1CA6900AAA21C /* Image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Image.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		534B96271AC71C1000E7A3A1 /* Frameworks */ = {
+		53B5245F1AD1CA3300AAA21C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				534B96371AC71C2900E7A3A1 /* GLUT.framework in Frameworks */,
-				534B96351AC71C2200E7A3A1 /* OpenGL.framework in Frameworks */,
+				53B5246F1AD1CA4600AAA21C /* OpenGL.framework in Frameworks */,
+				53B5246D1AD1CA4000AAA21C /* GLUT.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		534B96211AC71C1000E7A3A1 = {
+		53B524591AD1CA3300AAA21C = {
 			isa = PBXGroup;
 			children = (
-				534B96361AC71C2900E7A3A1 /* GLUT.framework */,
-				534B96341AC71C2200E7A3A1 /* OpenGL.framework */,
-				534B962C1AC71C1000E7A3A1 /* ReadImageFile */,
-				534B962B1AC71C1000E7A3A1 /* Products */,
+				53B5246E1AD1CA4600AAA21C /* OpenGL.framework */,
+				53B5246C1AD1CA4000AAA21C /* GLUT.framework */,
+				53B524641AD1CA3300AAA21C /* SuperMarioSoccer */,
+				53B524631AD1CA3300AAA21C /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		534B962B1AC71C1000E7A3A1 /* Products */ = {
+		53B524631AD1CA3300AAA21C /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				534B962A1AC71C1000E7A3A1 /* ReadImageFile */,
+				53B524621AD1CA3300AAA21C /* SuperMarioSoccer */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		534B962C1AC71C1000E7A3A1 /* ReadImageFile */ = {
+		53B524641AD1CA3300AAA21C /* SuperMarioSoccer */ = {
 			isa = PBXGroup;
 			children = (
-				534B962D1AC71C1000E7A3A1 /* main.cpp */,
-				534B96381AC71C5100E7A3A1 /* Image.cpp */,
-				534B96391AC71C5100E7A3A1 /* Image.h */,
+				53B524651AD1CA3300AAA21C /* main.cpp */,
+				53B524701AD1CA6900AAA21C /* Image.cpp */,
+				53B524711AD1CA6900AAA21C /* Image.h */,
 			);
-			path = ReadImageFile;
+			path = SuperMarioSoccer;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		534B96291AC71C1000E7A3A1 /* ReadImageFile */ = {
+		53B524611AD1CA3300AAA21C /* SuperMarioSoccer */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 534B96311AC71C1000E7A3A1 /* Build configuration list for PBXNativeTarget "ReadImageFile" */;
+			buildConfigurationList = 53B524691AD1CA3300AAA21C /* Build configuration list for PBXNativeTarget "SuperMarioSoccer" */;
 			buildPhases = (
-				534B96261AC71C1000E7A3A1 /* Sources */,
-				534B96271AC71C1000E7A3A1 /* Frameworks */,
-				534B96281AC71C1000E7A3A1 /* CopyFiles */,
+				53B5245E1AD1CA3300AAA21C /* Sources */,
+				53B5245F1AD1CA3300AAA21C /* Frameworks */,
+				53B524601AD1CA3300AAA21C /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = ReadImageFile;
-			productName = ReadImageFile;
-			productReference = 534B962A1AC71C1000E7A3A1 /* ReadImageFile */;
+			name = SuperMarioSoccer;
+			productName = SuperMarioSoccer;
+			productReference = 53B524621AD1CA3300AAA21C /* SuperMarioSoccer */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		534B96221AC71C1000E7A3A1 /* Project object */ = {
+		53B5245A1AD1CA3300AAA21C /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0620;
 				ORGANIZATIONNAME = "Rafael Eyng";
 				TargetAttributes = {
-					534B96291AC71C1000E7A3A1 = {
+					53B524611AD1CA3300AAA21C = {
 						CreatedOnToolsVersion = 6.2;
 					};
 				};
 			};
-			buildConfigurationList = 534B96251AC71C1000E7A3A1 /* Build configuration list for PBXProject "ReadImageFile" */;
+			buildConfigurationList = 53B5245D1AD1CA3300AAA21C /* Build configuration list for PBXProject "SuperMarioSoccer" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 			);
-			mainGroup = 534B96211AC71C1000E7A3A1;
-			productRefGroup = 534B962B1AC71C1000E7A3A1 /* Products */;
+			mainGroup = 53B524591AD1CA3300AAA21C;
+			productRefGroup = 53B524631AD1CA3300AAA21C /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				534B96291AC71C1000E7A3A1 /* ReadImageFile */,
+				53B524611AD1CA3300AAA21C /* SuperMarioSoccer */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		534B96261AC71C1000E7A3A1 /* Sources */ = {
+		53B5245E1AD1CA3300AAA21C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				534B962E1AC71C1000E7A3A1 /* main.cpp in Sources */,
-				534B963A1AC71C5100E7A3A1 /* Image.cpp in Sources */,
+				53B524661AD1CA3300AAA21C /* main.cpp in Sources */,
+				53B524721AD1CA6900AAA21C /* Image.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		534B962F1AC71C1000E7A3A1 /* Debug */ = {
+		53B524671AD1CA3300AAA21C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -179,7 +179,7 @@
 			};
 			name = Debug;
 		};
-		534B96301AC71C1000E7A3A1 /* Release */ = {
+		53B524681AD1CA3300AAA21C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -213,14 +213,14 @@
 			};
 			name = Release;
 		};
-		534B96321AC71C1000E7A3A1 /* Debug */ = {
+		53B5246A1AD1CA3300AAA21C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
 		};
-		534B96331AC71C1000E7A3A1 /* Release */ = {
+		53B5246B1AD1CA3300AAA21C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -230,24 +230,24 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		534B96251AC71C1000E7A3A1 /* Build configuration list for PBXProject "ReadImageFile" */ = {
+		53B5245D1AD1CA3300AAA21C /* Build configuration list for PBXProject "SuperMarioSoccer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				534B962F1AC71C1000E7A3A1 /* Debug */,
-				534B96301AC71C1000E7A3A1 /* Release */,
+				53B524671AD1CA3300AAA21C /* Debug */,
+				53B524681AD1CA3300AAA21C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		534B96311AC71C1000E7A3A1 /* Build configuration list for PBXNativeTarget "ReadImageFile" */ = {
+		53B524691AD1CA3300AAA21C /* Build configuration list for PBXNativeTarget "SuperMarioSoccer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				534B96321AC71C1000E7A3A1 /* Debug */,
-				534B96331AC71C1000E7A3A1 /* Release */,
+				53B5246A1AD1CA3300AAA21C /* Debug */,
+				53B5246B1AD1CA3300AAA21C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 534B96221AC71C1000E7A3A1 /* Project object */;
+	rootObject = 53B5245A1AD1CA3300AAA21C /* Project object */;
 }

@@ -1,13 +1,13 @@
 //
 //  Image.h
-//  ReadImageFile
+//  SuperMarioSoccer
 //
-//  Created by Rafael Eyng on 3/28/15.
+//  Created by Rafael Eyng on 4/5/15.
 //  Copyright (c) 2015 Rafael Eyng. All rights reserved.
 //
 
-#ifndef __ReadImageFile__Image__
-#define __ReadImageFile__Image__
+#ifndef __SuperMarioSoccer__Image__
+#define __SuperMarioSoccer__Image__
 
 #include <stdio.h>
 
@@ -41,9 +41,9 @@ public:
             x += xStart;
             y += yStart;
             int a = (pixel >> 24) & 0x100;
-//            int r = (pixel >> 16) & 0x100;
-//            int g = (pixel >> 8) & 0x100;
-//            int b = pixel & 0x100;
+            //            int r = (pixel >> 16) & 0x100;
+            //            int g = (pixel >> 8) & 0x100;
+            //            int b = pixel & 0x100;
             // TODO - calcular o alpha de verdade
             if (a != 0 && (x < this->getWidth() && y < this->getHeight())) {
                 this->setPixels(pixel, x, y);
@@ -56,4 +56,4 @@ private:
     int width, height;
 };
 
-#endif /* defined(__ReadImageFile__Image__) */
+#endif /* defined(__SuperMarioSoccer__Image__) */

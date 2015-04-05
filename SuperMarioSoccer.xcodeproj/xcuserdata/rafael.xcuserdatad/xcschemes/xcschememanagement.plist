@@ -4,7 +4,7 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>ReadImageFile.xcscheme</key>
+		<key>SuperMarioSoccer.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>0</integer>
@@ -12,7 +12,7 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>534B96291AC71C1000E7A3A1</key>
+		<key>53B524611AD1CA3300AAA21C</key>
 		<dict>
 			<key>primary</key>
 			<true/>

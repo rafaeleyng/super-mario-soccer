@@ -36,18 +36,31 @@ int calcBallY() {
 //    t += 0.1;
     
     // TODO essa implementação é fake
-    int maxHeight = 300;
+    double startHeight = 100;
+    double heightToGain = 200.;
+    double minHeightOnFall = 150;
     double heightRatio;
     double halfOriginalT = originalT / 2;
+    double height;
     
     if (t > (halfOriginalT)) {
         heightRatio = (originalT - t) / halfOriginalT;
+        height = heightRatio * heightToGain;
+        height += startHeight;
     } else {
         heightRatio = t / halfOriginalT;
+        
+        double originalRange = heightToGain;
+        double fallRange = (startHeight + heightToGain) - minHeightOnFall;
+        heightRatio = (heightRatio / originalRange) * fallRange;
+        
+        height = heightRatio * heightToGain;
+        height += minHeightOnFall;
+
     }
     
     t -= 1;
-    return heightRatio * maxHeight;
+    return height;
 }
 
 int generateRandomRgb() {
@@ -61,7 +74,6 @@ int generateRandomRgb() {
 Image* getBallSprite() {
     Image *ball;
     int index = frame % 7;
-    printf("time: %.2f\n", t);
     if (t > 67) {
         ball = ballsB[index];
     } else if (t > 33) {
@@ -77,7 +89,7 @@ Image* plotStuff() {
     Image *result = new Image(screenW, screenH);
     
     result->plot(field, 0, 0);
-    result->plot(ball, 0, calcBallY());
+    result->plot(ball, 100, calcBallY());
     
     return result;
 }
@@ -89,7 +101,7 @@ void play(int value) {
     glFlush();
     frame++;
     if (t >= 0) {
-        glutTimerFunc(50, play, 1);
+        glutTimerFunc(20, play, 1);
     }
 }
 

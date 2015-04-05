@@ -15,6 +15,7 @@
 #define PI 3.1415926535898
 using namespace std;
 
+const char *IMAGES_PATH = "/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/";
 int frame = 0;
 const int numberOfBalls = 4;
 int adjustBallX;
@@ -27,7 +28,36 @@ double t = numberOfInstants;
 int velocidade = 100;
 int horizontY = 240;
 
+// game state
+const int GAME_STATE_INITIAL = 0;
+const int GAME_STATE_PLAYING = 1;
+int GAME_STATE = GAME_STATE_INITIAL;
+
+// options
+const int OPTION_DIRECTION = 0;
+const int OPTION_HEIGHT = 1;
+const int OPTION_STRENGTH = 2;
+int FIRST_OPTION = OPTION_DIRECTION;
+int LAST_OPTION = OPTION_STRENGTH;
+int CURRENT_OPTION = OPTION_DIRECTION;
+int OPTIONS_VALUES[3];
+
+// keys
+const int KEY_KICK = 32; // spacebar
+const int KEY_UP = 119; // w
+const int KEY_RIGHT = 100; // d
+const int KEY_DOWN = 115; // s
+const int KEY_LEFT = 97; // a
+
 // images
+Image *optionDirection;
+Image *optionHeight;
+Image *optionStrength;
+
+Image *optionsDirection[3];
+Image *optionsHeight[3];
+Image *optionsStrength[3];
+
 Image *ballsL[numberOfBalls];
 Image *ballsM[numberOfBalls];
 Image *ballsS[numberOfBalls];
@@ -38,6 +68,40 @@ Image *barrierL0;
 Image *barrierL1;
 Image *barrierR0;
 Image *barrierR1;
+
+double getSpeed() {
+    int optionValue = OPTIONS_VALUES[OPTION_STRENGTH];
+    if (optionValue == 0) {
+        return 50;
+    }
+    if (optionValue == 1) {
+        return 100;
+    }
+    return 200;
+}
+
+double getAngle() {
+    int optionValue = OPTIONS_VALUES[OPTION_HEIGHT];
+    if (optionValue == 0) {
+        return 30;
+    }
+    if (optionValue == 1) {
+        return 45;
+    }
+    return 60;
+}
+
+double getLateralDisplacement() {
+    int optionValue = OPTIONS_VALUES[OPTION_DIRECTION];
+    double displacement = 130.0;
+    if (optionValue == 0) {
+        return - displacement;
+    }
+    if (optionValue == 1) {
+        return 0;
+    }
+    return displacement;
+}
 
 int calcBallY() {
     // TODO implementar a balística de verdade
@@ -56,11 +120,14 @@ int calcBallY() {
     double halfOriginalT = originalT / 2;
     double height;
     
+    // subida
     if (t > (halfOriginalT)) {
         heightRatio = (originalT - t) / halfOriginalT;
         height = heightRatio * heightToGain;
         height += startHeight;
-    } else {
+    }
+    // queda
+    else {
         heightRatio = t / halfOriginalT;
         
         double originalRange = heightToGain;
@@ -72,16 +139,14 @@ int calcBallY() {
 
     }
     
-    t -= 1;
     return height;
 }
 
 int calcBallX() {
-    double lateralDisplacement = -100;
+    double lateralDisplacement = getLateralDisplacement();
     double tRatio = 1.0 / numberOfInstants;
     double howMuchToDisplace = tRatio * lateralDisplacement;
     ballX += howMuchToDisplace;
-//    printf("howMuchToDisplace: %.2f\n", howMuchToDisplace);
     return ballX;
 }
 
@@ -109,7 +174,7 @@ Image* getBallSprite() {
     return ball;
 }
 
-Image* plotStuff() {
+Image* getGameImage() {
     Image *ball = getBallSprite();
     Image *result = new Image(screenW, screenH);
     
@@ -119,16 +184,45 @@ Image* plotStuff() {
     result->plot(barrierL1, 200, 180);
     result->plot(barrierR0, 300, 180);
     result->plot(barrierR1, 400, 180);
+    
     result->plot(ball, calcBallX() + adjustBallX, calcBallY());
     
     return result;
 }
 
-void play(int value) {
-    //    glRasterPos2d(0.5, 0.5);
-    Image *resultImage = plotStuff();
-    glDrawPixels(resultImage->getWidth(), resultImage->getHeight(), GL_BGRA_EXT, GL_UNSIGNED_BYTE, resultImage->getPixels());
+Image* getOptionsImage() {
+    Image *optionsImage = new Image(screenW, 70);
+    for (int i = 0; i < optionsImage->getHeight() * optionsImage->getWidth(); i++) {
+        int a = 255, r = 0, g = 0, b = 0;
+        int x = i % screenW;
+        int y = i / screenW;
+        int pixel = (a << 24) | (r << 16) | (g << 8) | b;
+        optionsImage->setPixels(pixel, x, y);
+    }
+    
+    // plot option labels
+    optionsImage->plot(optionDirection, 10, 20);
+    optionsImage->plot(optionHeight, 210, 20);
+    optionsImage->plot(optionStrength, 410, 20);
+    
+    // plot option values
+    optionsImage->plot(optionsDirection[OPTIONS_VALUES[OPTION_DIRECTION]], 110, 20);
+    optionsImage->plot(optionsHeight[OPTIONS_VALUES[OPTION_HEIGHT]], 310, 20);
+    optionsImage->plot(optionsStrength[OPTIONS_VALUES[OPTION_STRENGTH]], 460, 20);
+    
+    
+    return optionsImage;
+}
+
+void drawImage(Image *image) {
+    glDrawPixels(image->getWidth(), image->getHeight(), GL_BGRA_EXT, GL_UNSIGNED_BYTE, image->getPixels());
     glFlush();
+}
+
+void play(int value) {
+    t -= 1;
+    Image *gameImage = getGameImage();
+    drawImage(gameImage);
     frame++;
     if (t >= 0) {
         if (t == 99) {
@@ -140,14 +234,18 @@ void play(int value) {
 }
 
 Image* loadImage(char const *path) {
-    ifstream arq(path);
+    char str[300];
+    strcpy(str, IMAGES_PATH);
+    strcat(str, path);
+    
+    ifstream arq(str);
     char BUFFER[256];
     arq >> BUFFER;
     
     if (BUFFER[1] == '3' || BUFFER[1] == '7') {
-//        printf("Modo texto\n");
+        // modo texto
     } else {
-//        printf("Modo binário\n");
+        // modo binário
     }
     
     int w, h, max;
@@ -169,46 +267,112 @@ Image* loadImage(char const *path) {
 
 void display(void) {
     glClear(GL_COLOR_BUFFER_BIT);
-    play(1);
+    
+    Image *gameImage = getGameImage();
+    Image *optionsImage = getOptionsImage();
+    gameImage->plot(optionsImage, 0, 0);
+    drawImage(gameImage);
+
+    if (GAME_STATE == GAME_STATE_PLAYING) {
+        play(1);
+    }
 }
 
 void loadImages() {
+    // options
+    optionDirection = loadImage("options/direction.ptm");
+    optionHeight = loadImage("options/height.ptm");
+    optionStrength = loadImage("options/strength.ptm");
+    
+    optionsDirection[0] = loadImage("options/direction0.ptm");
+    optionsDirection[1] = loadImage("options/direction1.ptm");
+    optionsDirection[2] = loadImage("options/direction2.ptm");
+    optionsHeight[0] = loadImage("options/height0.ptm");
+    optionsHeight[1] = loadImage("options/height1.ptm");
+    optionsHeight[2] = loadImage("options/height2.ptm");
+    optionsStrength[0] = loadImage("options/strength0.ptm");
+    optionsStrength[1] = loadImage("options/strength1.ptm");
+    optionsStrength[2] = loadImage("options/strength2.ptm");
+    
     // field
-    field = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/field.ptm");
+    field = loadImage("field.ptm");
     
     // barrier
-    barrierL0 = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/barrierL0.ptm");
-    barrierL1 = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/barrierL1.ptm");
-    barrierR0 = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/barrierR0.ptm");
-    barrierR1 = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/barrierR1.ptm");
+    barrierL0 = loadImage("enemies/barrierL0.ptm");
+    barrierL1 = loadImage("enemies/barrierL1.ptm");
+    barrierR0 = loadImage("enemies/barrierR0.ptm");
+    barrierR1 = loadImage("enemies/barrierR1.ptm");
 
     // goalkeeper
-    goalkeeperL = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/goalkeeperL.ptm");
-    goalkeeperR = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/goalkeeperR.ptm");
+    goalkeeperL = loadImage("enemies/goalkeeperL.ptm");
+    goalkeeperR = loadImage("enemies/goalkeeperR.ptm");
     
     // balls large
-    ballsL[0] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballL/ball0.ptm");
-    ballsL[1] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballL/ball1.ptm");
-    ballsL[2] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballL/ball2.ptm");
-    ballsL[3] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballL/ball3.ptm");
+    ballsL[0] = loadImage("ballL/ball0.ptm");
+    ballsL[1] = loadImage("ballL/ball1.ptm");
+    ballsL[2] = loadImage("ballL/ball2.ptm");
+    ballsL[3] = loadImage("ballL/ball3.ptm");
 
     // balls medium
-    ballsM[0] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballM/ball0.ptm");
-    ballsM[1] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballM/ball1.ptm");
-    ballsM[2] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballM/ball2.ptm");
-    ballsM[3] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballM/ball3.ptm");
+    ballsM[0] = loadImage("ballM/ball0.ptm");
+    ballsM[1] = loadImage("ballM/ball1.ptm");
+    ballsM[2] = loadImage("ballM/ball2.ptm");
+    ballsM[3] = loadImage("ballM/ball3.ptm");
 
     // balls small
-    ballsS[0] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballS/ball0.ptm");
-    ballsS[1] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballS/ball1.ptm");
-    ballsS[2] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballS/ball2.ptm");
-    ballsS[3] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballS/ball3.ptm");
+    ballsS[0] = loadImage("ballS/ball0.ptm");
+    ballsS[1] = loadImage("ballS/ball1.ptm");
+    ballsS[2] = loadImage("ballS/ball2.ptm");
+    ballsS[3] = loadImage("ballS/ball3.ptm");
+}
+
+void handleOptions(int key) {
+    if ((key == KEY_LEFT && CURRENT_OPTION == FIRST_OPTION)
+        || (key == KEY_RIGHT && CURRENT_OPTION == LAST_OPTION)
+        || (key == KEY_UP && OPTIONS_VALUES[CURRENT_OPTION] == 2)
+        || (key == KEY_DOWN && OPTIONS_VALUES[CURRENT_OPTION] == 0)) {
+        return;
+    }
+    
+    if (key == KEY_LEFT) {
+        CURRENT_OPTION--;
+    } else if (key == KEY_RIGHT) {
+        CURRENT_OPTION++;
+    } else if (key == KEY_UP) {
+        OPTIONS_VALUES[CURRENT_OPTION]++;
+    } else if (key == KEY_DOWN) {
+        OPTIONS_VALUES[CURRENT_OPTION]--;
+    }
+    
+    printf("Options: %d, %d, %d\n", OPTIONS_VALUES[0], OPTIONS_VALUES[1], OPTIONS_VALUES[2]);
+}
+
+void keyboard(unsigned char key, int x, int y) {
+    switch (key) {
+        case 'q':
+        case 'Q':
+            exit(0);
+            break;
+        case KEY_UP:
+        case KEY_RIGHT:
+        case KEY_DOWN:
+        case KEY_LEFT:
+            handleOptions(key);
+            glutPostRedisplay();
+            break;
+        case KEY_KICK:
+            GAME_STATE = GAME_STATE_PLAYING;
+            glutPostRedisplay();
+            break;
+        default:
+            printf("faço nada\n");
+            break;
+    }
 }
 
 void init (void)
 {
-    /*  select clearing (background) color       */
-    glClearColor (0.0, 0.0, 0.0, 0.0);
+    glClearColor(1, 1, 1, 1);
     
     /*  initialize viewing values  */
     glMatrixMode(GL_PROJECTION);
@@ -228,6 +392,7 @@ int main(int argc, char** argv)
     glutCreateWindow ("hello");
     init ();
     glutDisplayFunc(display);
+    glutKeyboardFunc(keyboard);
     glutMainLoop();
     return 0;   /* ISO C requires main to return int. */
 }

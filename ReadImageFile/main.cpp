@@ -31,6 +31,7 @@ int horizontY = 240;
 // game state
 const int GAME_STATE_INITIAL = 0;
 const int GAME_STATE_PLAYING = 1;
+const int GAME_STATE_END = 2;
 int GAME_STATE = GAME_STATE_INITIAL;
 
 // options
@@ -113,7 +114,7 @@ int calcBallY() {
 //    t += 0.1;
     
     // TODO essa implementação é fake
-    double startHeight = 80;
+    double startHeight = 90;
     double heightToGain = 300.;
     double minHeightOnFall = horizontY;
     double heightRatio;
@@ -200,15 +201,16 @@ Image* getOptionsImage() {
         optionsImage->setPixels(pixel, x, y);
     }
     
+    int labelY = 10;
     // plot option labels
-    optionsImage->plot(optionDirection, 10, 20);
-    optionsImage->plot(optionHeight, 210, 20);
-    optionsImage->plot(optionStrength, 410, 20);
+    optionsImage->plot(optionDirection, 10, labelY);
+    optionsImage->plot(optionHeight, 210, labelY);
+    optionsImage->plot(optionStrength, 410, labelY);
     
     // plot option values
-    optionsImage->plot(optionsDirection[OPTIONS_VALUES[OPTION_DIRECTION]], 110, 20);
-    optionsImage->plot(optionsHeight[OPTIONS_VALUES[OPTION_HEIGHT]], 310, 20);
-    optionsImage->plot(optionsStrength[OPTIONS_VALUES[OPTION_STRENGTH]], 460, 20);
+    optionsImage->plot(optionsDirection[OPTIONS_VALUES[OPTION_DIRECTION]], 110, labelY);
+    optionsImage->plot(optionsHeight[OPTIONS_VALUES[OPTION_HEIGHT]], 310, labelY);
+    optionsImage->plot(optionsStrength[OPTIONS_VALUES[OPTION_STRENGTH]], 460, labelY);
     
     
     return optionsImage;
@@ -343,30 +345,40 @@ void handleOptions(int key) {
     } else if (key == KEY_DOWN) {
         OPTIONS_VALUES[CURRENT_OPTION]--;
     }
-    
-    printf("Options: %d, %d, %d\n", OPTIONS_VALUES[0], OPTIONS_VALUES[1], OPTIONS_VALUES[2]);
+//    printf("Options: %d, %d, %d\n", OPTIONS_VALUES[0], OPTIONS_VALUES[1], OPTIONS_VALUES[2]);
 }
 
 void keyboard(unsigned char key, int x, int y) {
-    switch (key) {
-        case 'q':
-        case 'Q':
-            exit(0);
+    switch (GAME_STATE) {
+        case GAME_STATE_INITIAL:
+            switch (key) {
+                case 'q':
+                case 'Q':
+                    exit(0);
+                    break;
+                case KEY_UP:
+                case KEY_RIGHT:
+                case KEY_DOWN:
+                case KEY_LEFT:
+                    handleOptions(key);
+                    glutPostRedisplay();
+                    break;
+                case KEY_KICK:
+                    GAME_STATE = GAME_STATE_PLAYING;
+                    glutPostRedisplay();
+                    break;
+            }
             break;
-        case KEY_UP:
-        case KEY_RIGHT:
-        case KEY_DOWN:
-        case KEY_LEFT:
-            handleOptions(key);
-            glutPostRedisplay();
-            break;
-        case KEY_KICK:
-            GAME_STATE = GAME_STATE_PLAYING;
-            glutPostRedisplay();
-            break;
-        default:
-            printf("faço nada\n");
-            break;
+        case GAME_STATE_END:
+            switch (key) {
+                case 'q':
+                case 'Q':
+                    exit(0);
+                    break;
+                case 'r':
+                case 'R':
+                    printf("Play again\n");
+            }
     }
 }
 

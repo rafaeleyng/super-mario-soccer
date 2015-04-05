@@ -23,8 +23,12 @@ double ballX = 360;
 int screenW = 800;
 int screenH = 717;
 const double originalT = 100;
-int numberOfInstants = 100;
-double t = numberOfInstants;
+//int numberOfInstants = 100;
+//double t = numberOfInstants;
+
+double originalDistance = 100;
+double currentDistance = 100;
+
 int velocidade = 100;
 int horizontY = 240;
 
@@ -73,12 +77,12 @@ Image *barrierR1;
 double getSpeed() {
     int optionValue = OPTIONS_VALUES[OPTION_STRENGTH];
     if (optionValue == 0) {
-        return 50;
+        return 0.5;
     }
     if (optionValue == 1) {
-        return 100;
+        return 1.0;
     }
-    return 200;
+    return 2.0;
 }
 
 double getAngle() {
@@ -118,18 +122,18 @@ int calcBallY() {
     double heightToGain = 300.;
     double minHeightOnFall = horizontY;
     double heightRatio;
-    double halfOriginalT = originalT / 2;
+    double halfDistance = originalDistance / 2;
     double height;
     
     // subida
-    if (t > (halfOriginalT)) {
-        heightRatio = (originalT - t) / halfOriginalT;
+    if (currentDistance > halfDistance) {
+        heightRatio = (originalDistance - currentDistance) / halfDistance;
         height = heightRatio * heightToGain;
         height += startHeight;
     }
     // queda
     else {
-        heightRatio = t / halfOriginalT;
+        heightRatio = currentDistance / halfDistance;
         
         double originalRange = heightToGain;
         double fallRange = (startHeight + heightToGain) - minHeightOnFall;
@@ -145,7 +149,7 @@ int calcBallY() {
 
 int calcBallX() {
     double lateralDisplacement = getLateralDisplacement();
-    double tRatio = 1.0 / numberOfInstants;
+    double tRatio = 1.0 / (originalDistance / getSpeed());
     double howMuchToDisplace = tRatio * lateralDisplacement;
     ballX += howMuchToDisplace;
     return ballX;
@@ -162,10 +166,10 @@ int generateRandomRgb() {
 Image* getBallSprite() {
     Image *ball;
     int index = frame % numberOfBalls;
-    if (t > 67) {
+    if (currentDistance > (originalDistance * 0.67)) {
         ball = ballsL[index];
         adjustBallX = 0;
-    } else if (t > 33) {
+    } else if (currentDistance > (originalDistance * 0.33)) {
         ball = ballsM[index];
         adjustBallX = 10;
     } else {
@@ -221,17 +225,20 @@ void drawImage(Image *image) {
     glFlush();
 }
 
+void updateDistance() {
+    currentDistance -= getSpeed();
+}
+
 void play(int value) {
-    t -= 1;
+    updateDistance();
     Image *gameImage = getGameImage();
     drawImage(gameImage);
     frame++;
-    if (t >= 0) {
-        if (t == 99) {
-            glutTimerFunc(2000, play, 1);
-        } else {
-            glutTimerFunc(15, play, 1);
-        }
+    
+    if (currentDistance <= 0) {
+        GAME_STATE = GAME_STATE_END;
+    } else {
+        glutTimerFunc(15, play, 1);
     }
 }
 
@@ -268,16 +275,28 @@ Image* loadImage(char const *path) {
 }
 
 void display(void) {
+//    double currentDistance = originalDistance;
     glClear(GL_COLOR_BUFFER_BIT);
-    
-    Image *gameImage = getGameImage();
-    Image *optionsImage = getOptionsImage();
-    gameImage->plot(optionsImage, 0, 0);
-    drawImage(gameImage);
 
-    if (GAME_STATE == GAME_STATE_PLAYING) {
-        play(1);
+    switch (GAME_STATE) {
+        case GAME_STATE_INITIAL: {
+            Image *gameImage = getGameImage();
+            Image *optionsImage = getOptionsImage();
+            gameImage->plot(optionsImage, 0, 0);
+            drawImage(gameImage);
+            
+            break;
+        }
+        case GAME_STATE_PLAYING: {
+            play(1);
+            break;
+        }
+
+        case GAME_STATE_END: {
+            break;
+        }
     }
+
 }
 
 void loadImages() {
@@ -377,7 +396,8 @@ void keyboard(unsigned char key, int x, int y) {
                     break;
                 case 'r':
                 case 'R':
-                    printf("Play again\n");
+                    GAME_STATE = GAME_STATE_INITIAL;
+                    glutPostRedisplay();
             }
     }
 }

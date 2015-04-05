@@ -10,7 +10,9 @@
 #include <GLUT/GLUT.h>
 #include "Image.h"
 #include <fstream>
+#include <math.h>
 
+#define PI 3.1415926535898
 using namespace std;
 
 int frame = 0;
@@ -20,6 +22,33 @@ Image *ballsS[7];
 Image *field;
 int screenW = 450;
 int screenH = 430;
+const double originalT = 100;
+double t = 100;
+int velocidade = 100;
+
+int calcBallY() {
+    // TODO implementar a balística de verdade
+//    double x, y, g = 9.8;
+//    double angulo = 30.0;
+//    double a = angulo / 180 * PI;
+//    x = velocidade * cos(a) * t;
+//    y = v * sin(a) * ( (x / velocidade) * cos(a) ) - ( (g*x*x) / 2*(v*v * cos(a) * cos(a) ) );
+//    t += 0.1;
+    
+    // TODO essa implementação é fake
+    int maxHeight = 300;
+    double heightRatio;
+    double halfOriginalT = originalT / 2;
+    
+    if (t > (halfOriginalT)) {
+        heightRatio = (originalT - t) / halfOriginalT;
+    } else {
+        heightRatio = t / halfOriginalT;
+    }
+    
+    t -= 1;
+    return heightRatio * maxHeight;
+}
 
 int generateRandomRgb() {
     int r = rand() * 255;
@@ -31,12 +60,14 @@ int generateRandomRgb() {
 
 Image* getBallSprite() {
     Image *ball;
-    if (frame < 33) {
-        ball = ballsB[frame%7];
-    } else if (frame < 67) {
-        ball = ballsM[frame%7];
+    int index = frame % 7;
+    printf("time: %.2f\n", t);
+    if (t > 67) {
+        ball = ballsB[index];
+    } else if (t > 33) {
+        ball = ballsM[index];
     } else {
-        ball = ballsS[frame%7];
+        ball = ballsS[index];
     }
     return ball;
 }
@@ -46,7 +77,7 @@ Image* plotStuff() {
     Image *result = new Image(screenW, screenH);
     
     result->plot(field, 0, 0);
-    result->plot(ball, 0, frame*5);
+    result->plot(ball, 0, calcBallY());
     
     return result;
 }
@@ -57,8 +88,9 @@ void play(int value) {
     glDrawPixels(resultImage->getWidth(), resultImage->getHeight(), GL_BGRA_EXT, GL_UNSIGNED_BYTE, resultImage->getPixels());
     glFlush();
     frame++;
-    glutTimerFunc(50, play, 1);
-    
+    if (t >= 0) {
+        glutTimerFunc(50, play, 1);
+    }
 }
 
 Image* loadImage(char const *path) {
@@ -145,7 +177,7 @@ int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
     glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB);
-    glutInitWindowSize (640, 480);
+    glutInitWindowSize (450, 430);
     glutInitWindowPosition (100, 100);
     glutCreateWindow ("hello");
     init ();

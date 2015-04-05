@@ -20,11 +20,13 @@ Image *ballsB[7];
 Image *ballsM[7];
 Image *ballsS[7];
 int adjustBallX;
+double ballX = 200;
 Image *field;
 int screenW = 450;
 int screenH = 430;
 const double originalT = 100;
-double t = 100;
+int numberOfInstants = 100;
+double t = numberOfInstants;
 int velocidade = 100;
 
 int calcBallY() {
@@ -64,6 +66,15 @@ int calcBallY() {
     return height;
 }
 
+int calcBallX() {
+    double lateralDisplacement = -150;
+    double tRatio = 1.0 / numberOfInstants;
+    double howMuchToDisplace = tRatio * lateralDisplacement;
+    ballX += howMuchToDisplace;
+    printf("howMuchToDisplace: %.2f\n", howMuchToDisplace);
+    return ballX;
+}
+
 int generateRandomRgb() {
     int r = rand() * 255;
     int g = rand() * 255;
@@ -93,7 +104,7 @@ Image* plotStuff() {
     Image *result = new Image(screenW, screenH);
     
     result->plot(field, 0, 0);
-    result->plot(ball, 200 + adjustBallX, calcBallY());
+    result->plot(ball, calcBallX() + adjustBallX, calcBallY());
     
     return result;
 }

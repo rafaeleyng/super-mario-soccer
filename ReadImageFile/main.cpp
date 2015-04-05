@@ -19,6 +19,7 @@ int frame = 0;
 Image *ballsB[7];
 Image *ballsM[7];
 Image *ballsS[7];
+int adjustBallX;
 Image *field;
 int screenW = 450;
 int screenH = 430;
@@ -76,10 +77,13 @@ Image* getBallSprite() {
     int index = frame % 7;
     if (t > 67) {
         ball = ballsB[index];
+        adjustBallX = 0;
     } else if (t > 33) {
         ball = ballsM[index];
+        adjustBallX = 10;
     } else {
         ball = ballsS[index];
+        adjustBallX = 20;
     }
     return ball;
 }
@@ -89,7 +93,7 @@ Image* plotStuff() {
     Image *result = new Image(screenW, screenH);
     
     result->plot(field, 0, 0);
-    result->plot(ball, 100, calcBallY());
+    result->plot(ball, 200 + adjustBallX, calcBallY());
     
     return result;
 }

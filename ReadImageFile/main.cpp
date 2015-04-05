@@ -20,10 +20,11 @@ Image *ballsB[7];
 Image *ballsM[7];
 Image *ballsS[7];
 int adjustBallX;
-double ballX = 200;
+double ballX = 360;
 Image *field;
-int screenW = 450;
-int screenH = 430;
+Image *barreira;
+int screenW = 800;
+int screenH = 717;
 const double originalT = 100;
 int numberOfInstants = 100;
 double t = numberOfInstants;
@@ -39,9 +40,9 @@ int calcBallY() {
 //    t += 0.1;
     
     // TODO essa implementação é fake
-    double startHeight = 100;
-    double heightToGain = 200.;
-    double minHeightOnFall = 150;
+    double startHeight = 200;
+    double heightToGain = 300.;
+    double minHeightOnFall = 240;
     double heightRatio;
     double halfOriginalT = originalT / 2;
     double height;
@@ -67,11 +68,11 @@ int calcBallY() {
 }
 
 int calcBallX() {
-    double lateralDisplacement = -150;
+    double lateralDisplacement = -100;
     double tRatio = 1.0 / numberOfInstants;
     double howMuchToDisplace = tRatio * lateralDisplacement;
     ballX += howMuchToDisplace;
-    printf("howMuchToDisplace: %.2f\n", howMuchToDisplace);
+//    printf("howMuchToDisplace: %.2f\n", howMuchToDisplace);
     return ballX;
 }
 
@@ -104,6 +105,7 @@ Image* plotStuff() {
     Image *result = new Image(screenW, screenH);
     
     result->plot(field, 0, 0);
+    result->plot(barreira, 0, 0);
     result->plot(ball, calcBallX() + adjustBallX, calcBallY());
     
     return result;
@@ -157,6 +159,9 @@ void loadImages() {
     // field
     field = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/field.ptm");
     
+    // barreira
+    barreira = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/barreira2.ptm");
+    
     // balls big
     ballsB[0] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballB/ball0.ptm");
     ballsB[1] = loadImage("/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/ReadImageFile/ReadImageFile/img/ballB/ball1.ptm");
@@ -195,7 +200,7 @@ void init (void)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluOrtho2D(0.0, 1.0, 0.0, 1.0);
-    glViewport(0, 0, 450, 430);
+    glViewport(0, 0, screenW, screenH);
     
     loadImages();
 }
@@ -204,7 +209,7 @@ int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
     glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB);
-    glutInitWindowSize (450, 430);
+    glutInitWindowSize (screenW, screenH);
     glutInitWindowPosition (100, 100);
     glutCreateWindow ("hello");
     init ();

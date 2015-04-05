@@ -452,7 +452,7 @@ int main(int argc, char** argv)
     glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB);
     glutInitWindowSize (screenW, screenH);
     glutInitWindowPosition (100, 100);
-    glutCreateWindow ("hello");
+    glutCreateWindow ("Super Mario Soccer");
     init ();
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);

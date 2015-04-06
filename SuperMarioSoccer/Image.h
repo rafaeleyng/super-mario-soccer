@@ -9,8 +9,6 @@
 #ifndef __SuperMarioSoccer__Image__
 #define __SuperMarioSoccer__Image__
 
-#include <stdio.h>
-
 class Image {
 public:
     Image(int w, int h) {

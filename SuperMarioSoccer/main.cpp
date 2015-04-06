@@ -6,16 +6,14 @@
 //  Copyright (c) 2015 Rafael Eyng. All rights reserved.
 //
 
-#include <iostream>
 #include <GLUT/GLUT.h>
-#include "Image.h"
-#include <fstream>
 #include <math.h>
+#include "ImageUtil.h"
+#include "Image.h"
+#include "Element.h"
 
 #define PI 3.1415926535898
-using namespace std;
 
-const char *IMAGES_PATH = "/Users/rafael/Google Drive/unisinos/03_processamento_grafico/exercicios/SuperMarioSoccer/SuperMarioSoccer/img/";
 int frame = 0;
 const int numberOfBalls = 4;
 int adjustBallX;
@@ -57,6 +55,15 @@ Image *optionDirection;
 Image *optionHeight;
 Image *optionStrength;
 
+Image *imageField;
+Image *imageGoalkeeperL;
+Image *imageGoalkeeperR;
+
+Image *imageBarrierL0;
+Image *imageBarrierL1;
+Image *imageBarrierR0;
+Image *imageBarrierR1;
+
 Image *optionsDirection[3];
 Image *optionsHeight[3];
 Image *optionsStrength[3];
@@ -64,13 +71,13 @@ Image *optionsStrength[3];
 Image *ballsL[numberOfBalls];
 Image *ballsM[numberOfBalls];
 Image *ballsS[numberOfBalls];
-Image *field;
-Image *goalkeeperL;
-Image *goalkeeperR;
-Image *barrierL0;
-Image *barrierL1;
-Image *barrierR0;
-Image *barrierR1;
+
+
+// elements
+Element *field;
+Element *goalkeeper;
+Element *barrier0;
+Element *barrier1;
 
 void startNewGame() {
     printf("start new game");
@@ -192,13 +199,10 @@ Image* getGameImage() {
     Image *ball = getBallSprite();
     Image *result = new Image(screenW, screenH);
     
-    result->plot(field, 0, 0);
-    result->plot(goalkeeperL, 300, horizontY + 20);
-    result->plot(barrierL0, 100, 180);
-    result->plot(barrierR0, 300, 180);
-    
-    //    result->plot(barrierL1, 200, 180);
-    //    result->plot(barrierR1, 400, 180);
+    field->plotOn(result);
+    goalkeeper->plotOn(result);
+    barrier0->plotOn(result);
+    barrier1->plotOn(result);
     
     result->plot(ball, calcBallX() + adjustBallX, calcBallY());
     
@@ -271,38 +275,6 @@ void play(int value) {
     }
 }
 
-Image* loadImage(char const *path) {
-    char str[300];
-    strcpy(str, IMAGES_PATH);
-    strcat(str, path);
-    
-    ifstream arq(str);
-    char BUFFER[256];
-    arq >> BUFFER;
-    
-    if (BUFFER[1] == '3' || BUFFER[1] == '7') {
-        // modo texto
-    } else {
-        // modo binário
-    }
-    
-    int w, h, max;
-    arq >> w >> h;
-    arq >> max;
-    
-    Image *image = new Image(w, h);
-    for (int i = 0; i < w * h; i++) {
-        int a, r, g, b;
-        arq >> a >> r >> g >> b;
-        int x = i % w;
-        int y = i / w;
-        y = h - y - 1; // inverte o y
-        int pixel = (a << 24) | (r << 16) | (g << 8) | b;
-        image->setPixels(pixel, x, y);
-    }
-    return image;
-}
-
 void display(void) {
     glClear(GL_COLOR_BUFFER_BIT);
     
@@ -328,53 +300,61 @@ void display(void) {
     
 }
 
-void loadImages() {
+void initImages() {
     // options
-    arrow = loadImage("options/arrow.ptm");
-    optionDirection = loadImage("options/direction.ptm");
-    optionHeight = loadImage("options/height.ptm");
-    optionStrength = loadImage("options/strength.ptm");
+    arrow = ImageUtil::loadImage("options/arrow.ptm");
+    optionDirection = ImageUtil::loadImage("options/direction.ptm");
+    optionHeight = ImageUtil::loadImage("options/height.ptm");
+    optionStrength = ImageUtil::loadImage("options/strength.ptm");
     
-    optionsDirection[0] = loadImage("options/direction0.ptm");
-    optionsDirection[1] = loadImage("options/direction1.ptm");
-    optionsDirection[2] = loadImage("options/direction2.ptm");
-    optionsHeight[0] = loadImage("options/height0.ptm");
-    optionsHeight[1] = loadImage("options/height1.ptm");
-    optionsHeight[2] = loadImage("options/height2.ptm");
-    optionsStrength[0] = loadImage("options/strength0.ptm");
-    optionsStrength[1] = loadImage("options/strength1.ptm");
-    optionsStrength[2] = loadImage("options/strength2.ptm");
+    optionsDirection[0] = ImageUtil::loadImage("options/direction0.ptm");
+    optionsDirection[1] = ImageUtil::loadImage("options/direction1.ptm");
+    optionsDirection[2] = ImageUtil::loadImage("options/direction2.ptm");
+    optionsHeight[0] = ImageUtil::loadImage("options/height0.ptm");
+    optionsHeight[1] = ImageUtil::loadImage("options/height1.ptm");
+    optionsHeight[2] = ImageUtil::loadImage("options/height2.ptm");
+    optionsStrength[0] = ImageUtil::loadImage("options/strength0.ptm");
+    optionsStrength[1] = ImageUtil::loadImage("options/strength1.ptm");
+    optionsStrength[2] = ImageUtil::loadImage("options/strength2.ptm");
     
     // field
-    field = loadImage("field.ptm");
+    imageField = ImageUtil::loadImage("field.ptm");
     
     // barrier
-    barrierL0 = loadImage("enemies/barrierL0.ptm");
-    barrierL1 = loadImage("enemies/barrierL1.ptm");
-    barrierR0 = loadImage("enemies/barrierR0.ptm");
-    barrierR1 = loadImage("enemies/barrierR1.ptm");
+    imageBarrierL0 = ImageUtil::loadImage("enemies/barrierL0.ptm");
+    imageBarrierL1 = ImageUtil::loadImage("enemies/barrierL1.ptm");
+    imageBarrierR0 = ImageUtil::loadImage("enemies/barrierR0.ptm");
+    imageBarrierR1 = ImageUtil::loadImage("enemies/barrierR1.ptm");
     
     // goalkeeper
-    goalkeeperL = loadImage("enemies/goalkeeperL.ptm");
-    goalkeeperR = loadImage("enemies/goalkeeperR.ptm");
+    imageGoalkeeperL = ImageUtil::loadImage("enemies/goalkeeperL.ptm");
+    imageGoalkeeperR = ImageUtil::loadImage("enemies/goalkeeperR.ptm");
     
     // balls large
-    ballsL[0] = loadImage("ballL/ball0.ptm");
-    ballsL[1] = loadImage("ballL/ball1.ptm");
-    ballsL[2] = loadImage("ballL/ball2.ptm");
-    ballsL[3] = loadImage("ballL/ball3.ptm");
+    ballsL[0] = ImageUtil::loadImage("ballL/ball0.ptm");
+    ballsL[1] = ImageUtil::loadImage("ballL/ball1.ptm");
+    ballsL[2] = ImageUtil::loadImage("ballL/ball2.ptm");
+    ballsL[3] = ImageUtil::loadImage("ballL/ball3.ptm");
     
     // balls medium
-    ballsM[0] = loadImage("ballM/ball0.ptm");
-    ballsM[1] = loadImage("ballM/ball1.ptm");
-    ballsM[2] = loadImage("ballM/ball2.ptm");
-    ballsM[3] = loadImage("ballM/ball3.ptm");
+    ballsM[0] = ImageUtil::loadImage("ballM/ball0.ptm");
+    ballsM[1] = ImageUtil::loadImage("ballM/ball1.ptm");
+    ballsM[2] = ImageUtil::loadImage("ballM/ball2.ptm");
+    ballsM[3] = ImageUtil::loadImage("ballM/ball3.ptm");
     
     // balls small
-    ballsS[0] = loadImage("ballS/ball0.ptm");
-    ballsS[1] = loadImage("ballS/ball1.ptm");
-    ballsS[2] = loadImage("ballS/ball2.ptm");
-    ballsS[3] = loadImage("ballS/ball3.ptm");
+    ballsS[0] = ImageUtil::loadImage("ballS/ball0.ptm");
+    ballsS[1] = ImageUtil::loadImage("ballS/ball1.ptm");
+    ballsS[2] = ImageUtil::loadImage("ballS/ball2.ptm");
+    ballsS[3] = ImageUtil::loadImage("ballS/ball3.ptm");
+}
+
+void initElements() {
+    field = new Element(imageField, 0, 0);
+    goalkeeper = new Element(imageGoalkeeperL, 300, horizontY + 20);
+    barrier0 = new Element(imageBarrierL0, 100, 180);
+    barrier1 = new Element(imageBarrierR0, 300, 180);
+    // TODO
 }
 
 void handleOptions(int key) {
@@ -443,7 +423,8 @@ void init (void)
     gluOrtho2D(0.0, 1.0, 0.0, 1.0);
     glViewport(0, 0, screenW, screenH);
     
-    loadImages();
+    initImages();
+    initElements();
 }
 
 int main(int argc, char** argv)

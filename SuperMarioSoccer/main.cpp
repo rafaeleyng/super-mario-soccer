@@ -15,9 +15,7 @@
 #define PI 3.1415926535898
 
 int frame = 0;
-const int numberOfBalls = 4;
 int adjustBallX;
-double ballX = 360;
 int screenW = 800;
 int screenH = 717;
 
@@ -49,11 +47,19 @@ const int KEY_RIGHT = 100; // d
 const int KEY_DOWN = 115; // s
 const int KEY_LEFT = 97; // a
 
+double const initialBallX = 360;
+double const initialBallY = 90;
+double ballX = initialBallX;
+
 // images
 Image *arrow;
 Image *optionDirection;
 Image *optionHeight;
 Image *optionStrength;
+
+Image *optionsDirection[3];
+Image *optionsHeight[3];
+Image *optionsStrength[3];
 
 Image *imageField;
 Image *imageGoalkeeperL;
@@ -64,20 +70,17 @@ Image *imageBarrierL1;
 Image *imageBarrierR0;
 Image *imageBarrierR1;
 
-Image *optionsDirection[3];
-Image *optionsHeight[3];
-Image *optionsStrength[3];
-
-Image *ballsL[numberOfBalls];
-Image *ballsM[numberOfBalls];
-Image *ballsS[numberOfBalls];
-
+const int numberOfBalls = 4;
+Image *imagesBallsL[numberOfBalls];
+Image *imagesBallsM[numberOfBalls];
+Image *imagesBallsS[numberOfBalls];
 
 // elements
 Element *field;
 Element *goalkeeper;
 Element *barrier0;
 Element *barrier1;
+Element *ball;
 
 void startNewGame() {
     printf("start new game");
@@ -134,7 +137,7 @@ int calcBallY() {
     //    t += 0.1;
     
     // TODO essa implementação é fake
-    double startHeight = 90;
+    double startHeight = initialBallY;
     double heightToGain = 300.;
     double minHeightOnFall = horizontY;
     double heightRatio;
@@ -183,28 +186,26 @@ Image* getBallSprite() {
     Image *ball;
     int index = frame % numberOfBalls;
     if (currentDistance > (originalDistance * 0.67)) {
-        ball = ballsL[index];
+        ball = imagesBallsL[index];
         adjustBallX = 0;
     } else if (currentDistance > (originalDistance * 0.33)) {
-        ball = ballsM[index];
+        ball = imagesBallsM[index];
         adjustBallX = 10;
     } else {
-        ball = ballsS[index];
+        ball = imagesBallsS[index];
         adjustBallX = 20;
     }
     return ball;
 }
 
 Image* getGameImage() {
-    Image *ball = getBallSprite();
     Image *result = new Image(screenW, screenH);
     
     field->plotOn(result);
     goalkeeper->plotOn(result);
     barrier0->plotOn(result);
     barrier1->plotOn(result);
-    
-    result->plot(ball, calcBallX() + adjustBallX, calcBallY());
+    ball->plotOn(result);
     
     return result;
 }
@@ -262,8 +263,15 @@ void updateDistance() {
     currentDistance -= getSpeed();
 }
 
+void updateBall() {
+    ball->setImage(getBallSprite());
+    ball->setX(calcBallX() + adjustBallX);
+    ball->setY(calcBallY());
+}
+
 void play(int value) {
     updateDistance();
+    updateBall();
     Image *gameImage = getGameImage();
     drawImage(gameImage);
     frame++;
@@ -331,22 +339,22 @@ void initImages() {
     imageGoalkeeperR = ImageUtil::loadImage("enemies/goalkeeperR.ptm");
     
     // balls large
-    ballsL[0] = ImageUtil::loadImage("ballL/ball0.ptm");
-    ballsL[1] = ImageUtil::loadImage("ballL/ball1.ptm");
-    ballsL[2] = ImageUtil::loadImage("ballL/ball2.ptm");
-    ballsL[3] = ImageUtil::loadImage("ballL/ball3.ptm");
+    imagesBallsL[0] = ImageUtil::loadImage("ballL/ball0.ptm");
+    imagesBallsL[1] = ImageUtil::loadImage("ballL/ball1.ptm");
+    imagesBallsL[2] = ImageUtil::loadImage("ballL/ball2.ptm");
+    imagesBallsL[3] = ImageUtil::loadImage("ballL/ball3.ptm");
     
     // balls medium
-    ballsM[0] = ImageUtil::loadImage("ballM/ball0.ptm");
-    ballsM[1] = ImageUtil::loadImage("ballM/ball1.ptm");
-    ballsM[2] = ImageUtil::loadImage("ballM/ball2.ptm");
-    ballsM[3] = ImageUtil::loadImage("ballM/ball3.ptm");
+    imagesBallsM[0] = ImageUtil::loadImage("ballM/ball0.ptm");
+    imagesBallsM[1] = ImageUtil::loadImage("ballM/ball1.ptm");
+    imagesBallsM[2] = ImageUtil::loadImage("ballM/ball2.ptm");
+    imagesBallsM[3] = ImageUtil::loadImage("ballM/ball3.ptm");
     
     // balls small
-    ballsS[0] = ImageUtil::loadImage("ballS/ball0.ptm");
-    ballsS[1] = ImageUtil::loadImage("ballS/ball1.ptm");
-    ballsS[2] = ImageUtil::loadImage("ballS/ball2.ptm");
-    ballsS[3] = ImageUtil::loadImage("ballS/ball3.ptm");
+    imagesBallsS[0] = ImageUtil::loadImage("ballS/ball0.ptm");
+    imagesBallsS[1] = ImageUtil::loadImage("ballS/ball1.ptm");
+    imagesBallsS[2] = ImageUtil::loadImage("ballS/ball2.ptm");
+    imagesBallsS[3] = ImageUtil::loadImage("ballS/ball3.ptm");
 }
 
 void initElements() {
@@ -354,6 +362,7 @@ void initElements() {
     goalkeeper = new Element(imageGoalkeeperL, 300, horizontY + 20);
     barrier0 = new Element(imageBarrierL0, 100, 180);
     barrier1 = new Element(imageBarrierR0, 300, 180);
+    ball = new Element(imagesBallsL[0], initialBallX, initialBallY); // TODO melhorar essa bola
     // TODO
 }
 

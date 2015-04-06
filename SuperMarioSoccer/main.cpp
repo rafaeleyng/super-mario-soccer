@@ -26,10 +26,10 @@ int velocidade = 100;
 int horizontY = 240;
 
 // game state
-const int GAME_STATE_INITIAL = 0;
-const int GAME_STATE_PLAYING = 1;
-const int GAME_STATE_END = 2;
-int GAME_STATE = GAME_STATE_INITIAL;
+const int GAME_STATE_BEFORE = 0;
+const int GAME_STATE_DURING = 1;
+const int GAME_STATE_AFTER = 2;
+int GAME_STATE = GAME_STATE_BEFORE;
 
 // options
 const int OPTION_DIRECTION = 0;
@@ -174,14 +174,6 @@ int calcBallX() {
     return ballX;
 }
 
-int generateRandomRgb() {
-    int r = rand() * 255;
-    int g = rand() * 255;
-    int b = rand() * 255;
-    int rgb = (r << 16) | (g << 8) | b;
-    return rgb;
-}
-
 Image* getBallSprite() {
     Image *ball;
     int index = frame % numberOfBalls;
@@ -277,7 +269,7 @@ void play(int value) {
     frame++;
     
     if (currentDistance <= 0) {
-        GAME_STATE = GAME_STATE_END;
+        GAME_STATE = GAME_STATE_AFTER;
     } else {
         glutTimerFunc(15, play, 1);
     }
@@ -287,7 +279,7 @@ void display(void) {
     glClear(GL_COLOR_BUFFER_BIT);
     
     switch (GAME_STATE) {
-        case GAME_STATE_INITIAL: {
+        case GAME_STATE_BEFORE: {
             Image *gameImage = getGameImage();
             Image *optionsImage = getOptionsImage();
             gameImage->plot(optionsImage, 0, 0);
@@ -295,13 +287,13 @@ void display(void) {
             
             break;
         }
-        case GAME_STATE_PLAYING: {
+        case GAME_STATE_DURING: {
             startNewGame();
             play(1);
             break;
         }
             
-        case GAME_STATE_END: {
+        case GAME_STATE_AFTER: {
             break;
         }
     }
@@ -388,7 +380,7 @@ void handleOptions(int key) {
 
 void keyboard(unsigned char key, int x, int y) {
     switch (GAME_STATE) {
-        case GAME_STATE_INITIAL:
+        case GAME_STATE_BEFORE:
             switch (key) {
                 case 'q':
                 case 'Q':
@@ -402,12 +394,12 @@ void keyboard(unsigned char key, int x, int y) {
                     glutPostRedisplay();
                     break;
                 case KEY_KICK:
-                    GAME_STATE = GAME_STATE_PLAYING;
+                    GAME_STATE = GAME_STATE_DURING;
                     glutPostRedisplay();
                     break;
             }
             break;
-        case GAME_STATE_END:
+        case GAME_STATE_AFTER:
             switch (key) {
                 case 'q':
                 case 'Q':
@@ -415,7 +407,7 @@ void keyboard(unsigned char key, int x, int y) {
                     break;
                 case 'r':
                 case 'R':
-                    GAME_STATE = GAME_STATE_INITIAL;
+                    GAME_STATE = GAME_STATE_BEFORE;
                     glutPostRedisplay();
             }
     }

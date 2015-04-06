@@ -49,11 +49,18 @@ public:
     void plotOn(Image *someImage) {
         someImage->plot(this->getImage(), this->getX(), this->getY());
     }
+    int getDirection() {
+        return this->direction;
+    }
+    void setDirection(int direction) {
+        this->direction = direction;
+    }
     
 private:
     Image *image;
     double x;
     double y;
+    int direction;
 };
 
 #endif /* defined(__SuperMarioSoccer__Element__) */

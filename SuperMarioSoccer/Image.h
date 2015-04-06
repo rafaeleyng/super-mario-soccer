@@ -16,6 +16,9 @@ public:
         height = h;
         pixels = new int[w*h];
     }
+    ~Image() {
+        delete pixels;
+    }
     void setPixels(int rgb, int x, int y) {
         pixels[(y * width) + x] = rgb;
     }

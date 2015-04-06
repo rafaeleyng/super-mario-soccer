@@ -83,11 +83,11 @@ Element *barrier1;
 Element *ball;
 
 void changeState(int newState) {
+    printf("state: %d\n", newState);
     GAME_STATE = newState;
 }
 
 void startNewGame() {
-    printf("start new game");
     currentDistance = originalDistance;
 }
 
@@ -274,27 +274,34 @@ void play(int value) {
     
     if (currentDistance <= 0) {
         changeState(GAME_STATE_AFTER);
-    } else {
-        glutTimerFunc(15, play, 1);
     }
 }
 
-void animateGoalkeeper(int value) {
-    goalkeeper->setX(goalkeeper->getX() - 1);
-    glutTimerFunc(15, animateGoalkeeper, 1);
+double goalLeft = 220;
+double goalRight = 590;
+void updateGoalkeeper() {
+    int goalkeeperStep = 5;
+    if (goalkeeper->getDirection() == 0) {
+        if (goalkeeper->getX() > goalLeft) {
+            goalkeeper->setX(goalkeeper->getX() - goalkeeperStep);
+        } else {
+            goalkeeper->setDirection(1);
+            goalkeeper->setImage(imageGoalkeeperR);
+        }
+    } else {
+        if (goalkeeper->getX() + goalkeeper->getImage()->getWidth() < goalRight) {
+            goalkeeper->setX(goalkeeper->getX() + goalkeeperStep);
+        } else {
+            goalkeeper->setDirection(0);
+            goalkeeper->setImage(imageGoalkeeperL);
+        }
+    }
+    // faz o swing vertical
+    goalkeeper->setY(horizontY + cos(goalkeeper->getX()/10.) * 10);
 }
 
-void redraw(int value) {
-    Image *gameImage = getGameImage();
-    drawImage(gameImage);
-    glutTimerFunc(15, redraw, 1);
-    
-}
-
-void display(void) {
-    glClear(GL_COLOR_BUFFER_BIT);
-    
-//    animateGoalkeeper(1);
+void draw(int value) {
+    updateGoalkeeper();
     
     switch (GAME_STATE) {
         case GAME_STATE_BEFORE: {
@@ -303,19 +310,27 @@ void display(void) {
             gameImage->plot(optionsImage, 0, 0);
             drawImage(gameImage);
             
+            delete gameImage;
+            delete optionsImage;
+            gameImage = nullptr;
+            optionsImage = nullptr;
             break;
         }
         case GAME_STATE_DURING: {
-            startNewGame();
             play(1);
             break;
         }
-            
         case GAME_STATE_AFTER: {
+            return;
             break;
         }
     }
-    
+    glutTimerFunc(50, draw, 1);
+}
+
+void display(void) {
+    glClear(GL_COLOR_BUFFER_BIT);
+    draw(0);
 }
 
 void handleOptions(int key) {
@@ -350,11 +365,12 @@ void keyboard(unsigned char key, int x, int y) {
                 case KEY_DOWN:
                 case KEY_LEFT:
                     handleOptions(key);
-                    glutPostRedisplay();
+//                    glutPostRedisplay();
                     break;
                 case KEY_KICK:
+                    startNewGame();
                     changeState(GAME_STATE_DURING);
-                    glutPostRedisplay();
+//                    glutPostRedisplay();
                     break;
             }
             break;
@@ -424,8 +440,9 @@ void initImages() {
 void initElements() {
     field = new Element(imageField, 0, 0);
     goalkeeper = new Element(imageGoalkeeperL, 300, horizontY + 20);
+    goalkeeper->setDirection(0);
     barrier0 = new Element(imageBarrierL0, 100, 180);
-    barrier1 = new Element(imageBarrierR0, 300, 180);
+    barrier1 = new Element(imageBarrierR0, 600, 180);
     ball = new Element(imagesBallsL[0], initialBallX, initialBallY); // TODO melhorar essa bola
     // TODO
 }
@@ -448,7 +465,7 @@ int main(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB);
     glutInitWindowSize (screenW, screenH);
-    glutInitWindowPosition (100, 100);
+    glutInitWindowPosition (300, 100);
     glutCreateWindow ("Super Mario Soccer");
     init ();
     glutDisplayFunc(display);

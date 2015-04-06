@@ -82,6 +82,10 @@ Element *barrier0;
 Element *barrier1;
 Element *ball;
 
+void changeState(int newState) {
+    GAME_STATE = newState;
+}
+
 void startNewGame() {
     printf("start new game");
     currentDistance = originalDistance;
@@ -269,14 +273,28 @@ void play(int value) {
     frame++;
     
     if (currentDistance <= 0) {
-        GAME_STATE = GAME_STATE_AFTER;
+        changeState(GAME_STATE_AFTER);
     } else {
         glutTimerFunc(15, play, 1);
     }
 }
 
+void animateGoalkeeper(int value) {
+    goalkeeper->setX(goalkeeper->getX() - 1);
+    glutTimerFunc(15, animateGoalkeeper, 1);
+}
+
+void redraw(int value) {
+    Image *gameImage = getGameImage();
+    drawImage(gameImage);
+    glutTimerFunc(15, redraw, 1);
+    
+}
+
 void display(void) {
     glClear(GL_COLOR_BUFFER_BIT);
+    
+//    animateGoalkeeper(1);
     
     switch (GAME_STATE) {
         case GAME_STATE_BEFORE: {
@@ -298,6 +316,60 @@ void display(void) {
         }
     }
     
+}
+
+void handleOptions(int key) {
+    if ((key == KEY_LEFT && CURRENT_OPTION == FIRST_OPTION)
+        || (key == KEY_RIGHT && CURRENT_OPTION == LAST_OPTION)
+        || (key == KEY_UP && OPTIONS_VALUES[CURRENT_OPTION] == 2)
+        || (key == KEY_DOWN && OPTIONS_VALUES[CURRENT_OPTION] == 0)) {
+        return;
+    }
+    
+    if (key == KEY_LEFT) {
+        CURRENT_OPTION--;
+    } else if (key == KEY_RIGHT) {
+        CURRENT_OPTION++;
+    } else if (key == KEY_UP) {
+        OPTIONS_VALUES[CURRENT_OPTION]++;
+    } else if (key == KEY_DOWN) {
+        OPTIONS_VALUES[CURRENT_OPTION]--;
+    }
+}
+
+void keyboard(unsigned char key, int x, int y) {
+    switch (GAME_STATE) {
+        case GAME_STATE_BEFORE:
+            switch (key) {
+                case 'q':
+                case 'Q':
+                    exit(0);
+                    break;
+                case KEY_UP:
+                case KEY_RIGHT:
+                case KEY_DOWN:
+                case KEY_LEFT:
+                    handleOptions(key);
+                    glutPostRedisplay();
+                    break;
+                case KEY_KICK:
+                    changeState(GAME_STATE_DURING);
+                    glutPostRedisplay();
+                    break;
+            }
+            break;
+        case GAME_STATE_AFTER:
+            switch (key) {
+                case 'q':
+                case 'Q':
+                    exit(0);
+                    break;
+                case 'r':
+                case 'R':
+                    changeState(GAME_STATE_BEFORE);
+                    glutPostRedisplay();
+            }
+    }
 }
 
 void initImages() {
@@ -358,63 +430,7 @@ void initElements() {
     // TODO
 }
 
-void handleOptions(int key) {
-    if ((key == KEY_LEFT && CURRENT_OPTION == FIRST_OPTION)
-        || (key == KEY_RIGHT && CURRENT_OPTION == LAST_OPTION)
-        || (key == KEY_UP && OPTIONS_VALUES[CURRENT_OPTION] == 2)
-        || (key == KEY_DOWN && OPTIONS_VALUES[CURRENT_OPTION] == 0)) {
-        return;
-    }
-    
-    if (key == KEY_LEFT) {
-        CURRENT_OPTION--;
-    } else if (key == KEY_RIGHT) {
-        CURRENT_OPTION++;
-    } else if (key == KEY_UP) {
-        OPTIONS_VALUES[CURRENT_OPTION]++;
-    } else if (key == KEY_DOWN) {
-        OPTIONS_VALUES[CURRENT_OPTION]--;
-    }
-    //    printf("Options: %d, %d, %d\n", OPTIONS_VALUES[0], OPTIONS_VALUES[1], OPTIONS_VALUES[2]);
-}
-
-void keyboard(unsigned char key, int x, int y) {
-    switch (GAME_STATE) {
-        case GAME_STATE_BEFORE:
-            switch (key) {
-                case 'q':
-                case 'Q':
-                    exit(0);
-                    break;
-                case KEY_UP:
-                case KEY_RIGHT:
-                case KEY_DOWN:
-                case KEY_LEFT:
-                    handleOptions(key);
-                    glutPostRedisplay();
-                    break;
-                case KEY_KICK:
-                    GAME_STATE = GAME_STATE_DURING;
-                    glutPostRedisplay();
-                    break;
-            }
-            break;
-        case GAME_STATE_AFTER:
-            switch (key) {
-                case 'q':
-                case 'Q':
-                    exit(0);
-                    break;
-                case 'r':
-                case 'R':
-                    GAME_STATE = GAME_STATE_BEFORE;
-                    glutPostRedisplay();
-            }
-    }
-}
-
-void init (void)
-{
+void init (void) {
     resetOptions(); // TODO tirar daqui
     glClearColor(1, 1, 1, 1);
     
@@ -428,8 +444,7 @@ void init (void)
     initElements();
 }
 
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB);
     glutInitWindowSize (screenW, screenH);

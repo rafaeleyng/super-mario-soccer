@@ -21,13 +21,15 @@ int screenH = 717;
 
 double t = 0.0;
 
-int ballH;
+double originalDistance = 700;
 
-double originalDistance = 100;
-double currentDistance = originalDistance;
+double ballH;
+double distanceTraveled;
 
-int velocidade = 100;
-int horizontY = 240;
+int const horizontY = 240;
+int const initialBallX = 360;
+int const initialBallY = 90;
+int ballX = initialBallX;
 
 // game state
 const int GAME_STATE_STARTING = 0;
@@ -51,10 +53,6 @@ const int KEY_UP = 119; // w
 const int KEY_RIGHT = 100; // d
 const int KEY_DOWN = 115; // s
 const int KEY_LEFT = 97; // a
-
-double const initialBallX = 360;
-double const initialBallY = 90;
-double ballX = initialBallX;
 
 // images
 Image *arrow;
@@ -93,7 +91,7 @@ void changeState(int newState) {
 }
 
 void startNewGame() {
-    currentDistance = originalDistance;
+    distanceTraveled = 0;
     t = 0.0;
 }
 
@@ -155,14 +153,14 @@ int calcBallY() {
     double height;
     
     // subida
-    if (currentDistance > halfDistance) {
-        heightRatio = (originalDistance - currentDistance) / halfDistance;
+    if (distanceTraveled < halfDistance) {
+        heightRatio = distanceTraveled / halfDistance;
         height = heightRatio * heightToGain;
         height += startHeight;
     }
     // queda
     else {
-        heightRatio = currentDistance / halfDistance;
+        heightRatio = (originalDistance - distanceTraveled) / halfDistance;
         
         double originalRange = heightToGain;
         double fallRange = (startHeight + heightToGain) - minHeightOnFall;
@@ -187,10 +185,10 @@ int calcBallX() {
 Image* getBallSprite() {
     Image *ball;
     int index = frame % numberOfBalls;
-    if (currentDistance > (originalDistance * 0.67)) {
+    if (distanceTraveled < (originalDistance * 0.33)) {
         ball = imagesBallsL[index];
         adjustBallX = 0;
-    } else if (currentDistance > (originalDistance * 0.33)) {
+    } else if (distanceTraveled < (originalDistance * 0.67)) {
         ball = imagesBallsM[index];
         adjustBallX = 10;
     } else {
@@ -261,10 +259,6 @@ void drawImage(Image *image) {
     glFlush();
 }
 
-void updateDistance() {
-    currentDistance -= getSpeed();
-}
-
 void updateBall() {
     ball->setImage(getBallSprite());
     ball->setX(calcBallX() + adjustBallX);
@@ -272,14 +266,34 @@ void updateBall() {
     ball->setY(ballH);
 }
 
+
+void ballistic(double elapsedTime) {
+    
+    double speed = 100;
+    double angleDeg = 45;
+    double g = 10;
+    
+    double angleRad = angleDeg * (3.14159 / 180.0);
+    double distance = speed * cosf(angleRad) * elapsedTime;
+    distanceTraveled = distance;
+    
+    double temp = distance / (speed * cos(angleRad));
+    double height = distance * tan(angleRad) - 0.5 * g * (temp * temp);
+    ballH = height + initialBallY;
+    
+    printf("distance: %.2f, height: %.2f\n", distance, height);
+}
+
 void play() {
-    updateDistance();
+    t += 0.2;
+    ballistic(t);
+
     updateBall();
     Image *gameImage = getGameImage();
     drawImage(gameImage);
     frame++;
     
-    if (currentDistance <= 0) {
+    if (distanceTraveled >= originalDistance) {
         changeState(GAME_STATE_AFTER);
     }
 }
@@ -307,22 +321,6 @@ void updateGoalkeeper() {
     goalkeeper->setY(horizontY + cos(goalkeeper->getX()/10.) * 10);
 }
 
-void ballistic(double elapsedTime) {
-    
-    double speed = 100;
-    double angleDeg = 45;
-    double g = 10;
-    
-    double angleRad = angleDeg * (3.14159 / 180.0);
-    double distance = speed * cosf(angleRad) * elapsedTime;
-    
-    double temp = distance / (speed * cos(angleRad));
-    double height = distance * tan(angleRad) - 0.5 * g * (temp * temp);
-    ballH = height + initialBallY;
-    
-    printf("distance: %.2f, height: %.2f\n", distance, height);
-}
-
 void drawGame(int value) {
     updateGoalkeeper();
     
@@ -341,8 +339,6 @@ void drawGame(int value) {
             break;
         }
         case GAME_STATE_DURING: {
-            t += 0.2;
-            ballistic(t);
 //            printf("time %.2f\n", t);
 
             play();

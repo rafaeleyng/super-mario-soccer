@@ -16,16 +16,18 @@ class Image;
 
 class Element {
 public:
-    Element(Image *image, int x, int y) {
+    Element(Image *image, int x, int y, double zPosition) {
         this->image = image;
         this->x = x;
         this->y = y;
+        this->zPosition = zPosition;
     }
-    Element(char const *path, int x, int y) : Element(ImageUtil::loadImage(path), x, y) {}
+    Element(Image *image, int x, int y) : Element(image, x, y, 1) {}
     Element(int x, int y) {
         this->setImage(NULL);
         this->setX(x);
         this->setY(y);
+        this->setZPosition(1);
     }
     Element() {}
     void setImage(Image *image) {
@@ -67,12 +69,19 @@ public:
     void setDirection(int direction) {
         this->direction = direction;
     }
+    double getZPosition() {
+        return this->zPosition;
+    }
+    void setZPosition(double zPosition) {
+        this->zPosition = zPosition;
+    }
     
 private:
     Image *image;
     int x;
     int y;
     int direction;
+    double zPosition; // percentual of the total depth
 };
 
 #endif /* defined(__SuperMarioSoccer__Element__) */

@@ -15,9 +15,12 @@
 #define PI 3.1415926535898
 
 int frame = 0;
-int adjustBallX;
+int adjustBallX; // to compensate the different sprit sizes for the ball
+int adjustBallY; // to compensate the difference of height of the horizont line from the starting ball position
 int screenW = 800;
 int screenH = 717;
+
+bool didBallPassBarrier;
 
 double t = 0.0;
 
@@ -25,6 +28,7 @@ double originalDistance = 700;
 
 double ballH;
 double distanceTraveled;
+double distanceStep;
 
 int const horizontY = 240;
 int const initialBallX = 360;
@@ -91,8 +95,13 @@ void changeState(int newState) {
 }
 
 void startNewGame() {
+    distanceStep = 0; // TODO melhorar isso, não deveria ser necessário
     distanceTraveled = 0;
     t = 0.0;
+    didBallPassBarrier = false;
+    // TODO resetar direit a bola, não está funcionando
+    ball->setX(initialBallX);
+    ball->setY(initialBallY);
 }
 
 void resetOptions() {
@@ -135,7 +144,7 @@ double getLateralDisplacement() {
     return displacement;
 }
 
-int calcBallY() {
+//int calcBallY() {
     // TODO implementar a balística de verdade
     //    double x, y, g = 9.8;
     //    double angulo = 30.0;
@@ -145,48 +154,34 @@ int calcBallY() {
     //    t += 0.1;
     
     // TODO essa implementação é fake
-    double startHeight = initialBallY;
-    double heightToGain = 300.;
-    double minHeightOnFall = horizontY;
-    double heightRatio;
-    double halfDistance = originalDistance / 2;
-    double height;
-    
-    // subida
-    if (distanceTraveled < halfDistance) {
-        heightRatio = distanceTraveled / halfDistance;
-        height = heightRatio * heightToGain;
-        height += startHeight;
-    }
-    // queda
-    else {
-        heightRatio = (originalDistance - distanceTraveled) / halfDistance;
-        
-        double originalRange = heightToGain;
-        double fallRange = (startHeight + heightToGain) - minHeightOnFall;
-        heightRatio = (heightRatio / originalRange) * fallRange;
-        
-        height = heightRatio * heightToGain;
-        height += minHeightOnFall;
-        
-    }
-    
-    return height;
-}
-
-bool didElementCollideWithElement(Element *e1, Element *e2) {
-    return
-    (
-     (e1->getX() >= e2->getX() && e1->getX() <= e2->getXEnd())
-     || (e1->getXEnd() >= e2->getX() && e1->getXEnd() <= e2->getXEnd())
-     )
-    &&
-    (
-     (e1->getY() >= e2->getY() && e1->getY() <= e2->getYEnd())
-     || (e1->getYEnd() >= e2->getY() && e1->getYEnd() <= e2->getYEnd())
-     )
-    ;
-}
+//    double startHeight = initialBallY;
+//    double heightToGain = 300.;
+//    double minHeightOnFall = horizontY;
+//    double heightRatio;
+//    double halfDistance = originalDistance / 2;
+//    double height;
+//    
+//    // subida
+//    if (distanceTraveled < halfDistance) {
+//        heightRatio = distanceTraveled / halfDistance;
+//        height = heightRatio * heightToGain;
+//        height += startHeight;
+//    }
+//    // queda
+//    else {
+//        heightRatio = (originalDistance - distanceTraveled) / halfDistance;
+//        
+//        double originalRange = heightToGain;
+//        double fallRange = (startHeight + heightToGain) - minHeightOnFall;
+//        heightRatio = (heightRatio / originalRange) * fallRange;
+//        
+//        height = heightRatio * heightToGain;
+//        height += minHeightOnFall;
+//        
+//    }
+//    
+//    return height;
+//}
 
 int calcBallX() {
     double lateralDisplacement = getLateralDisplacement();
@@ -199,10 +194,10 @@ int calcBallX() {
 Image* getBallSprite() {
     Image *ball;
     int index = frame % numberOfBalls;
-    if (distanceTraveled < (originalDistance * 0.33)) {
+    if (distanceTraveled < (originalDistance * 0.5)) {
         ball = imagesBallsL[index];
         adjustBallX = 0;
-    } else if (distanceTraveled < (originalDistance * 0.67)) {
+    } else if (distanceTraveled < (originalDistance * 0.75)) {
         ball = imagesBallsM[index];
         adjustBallX = 10;
     } else {
@@ -217,9 +212,16 @@ Image* getGameImage() {
     
     field->plotOn(result);
     goalkeeper->plotOn(result);
-    barrier0->plotOn(result);
-    barrier1->plotOn(result);
-    ball->plotOn(result);
+    
+    if (didBallPassBarrier) {
+        ball->plotOn(result);
+        barrier0->plotOn(result);
+        barrier1->plotOn(result);
+    } else {
+        barrier0->plotOn(result);
+        barrier1->plotOn(result);
+        ball->plotOn(result);
+    }
     
     return result;
 }
@@ -274,17 +276,21 @@ void drawImage(Image *image) {
 }
 
 void updateBall() {
+    // sprite
     ball->setImage(getBallSprite());
+    // x
     ball->setX(calcBallX() + adjustBallX);
-    //    ball->setY(calcBallY());
-    ball->setY(ballH);
+    // y
+    adjustBallY = (distanceTraveled / originalDistance) * horizontY;
+    int height = ballH + adjustBallY;
+    height = height > adjustBallY ? height : adjustBallY; // so the ball never go lower than the ground
+    ball->setY(height);
 }
-
 
 void calcBallPosition(double elapsedTime) {
     
-    double speed = 100;
-    double angleDeg = 45;
+    double speed = 80;
+    double angleDeg = 40;
     double g = 10;
     
     double angleRad = angleDeg * (3.14159 / 180.0);
@@ -295,17 +301,62 @@ void calcBallPosition(double elapsedTime) {
     double height = distance * tan(angleRad) - 0.5 * g * (temp * temp);
     ballH = height + initialBallY;
     
-    printf("distance: %.2f, height: %.2f\n", distance, height);
+//    printf("distance: %.2f, height: %.2f\n", distance, height);
+    
+    if (distanceStep == 0) {
+        distanceStep = distance; // TODO melhorar a forma de calcular isso
+    }
+}
+
+bool didElementCollideWithElement(Element *e1, Element *e2) {
+    return
+    (
+     (e1->getX() >= e2->getX() && e1->getX() <= e2->getXEnd())
+     || (e1->getXEnd() >= e2->getX() && e1->getXEnd() <= e2->getXEnd())
+     )
+    &&
+    (
+     (e1->getY() >= e2->getY() && e1->getY() <= e2->getYEnd())
+     || (e1->getYEnd() >= e2->getY() && e1->getYEnd() <= e2->getYEnd())
+     )
+    ;
+}
+
+bool willPassElement(double zBefore, double zAfter, Element *element) {
+    return zBefore < element->getZPosition() && zAfter >= element->getZPosition();
 }
 
 void checkCollisions() {
-    bool ballInGoalkeeper = didElementCollideWithElement(ball, goalkeeper);
     
-    if (ballInGoalkeeper) {
-        printf("Defendeu!\n");
-    } else {
-        printf("Gooooool!\n");
+    double zBefore = ball->getZPosition();
+    ball->setZPosition(distanceTraveled / originalDistance);
+    didBallPassBarrier = ball->getZPosition() >= barrier0->getZPosition();
+    double zAfter = ball->getZPosition();
+    
+    if (willPassElement(zBefore, zAfter, barrier0)) {
+        bool didCollide = didElementCollideWithElement(ball, barrier0);
+        if (didCollide) {
+            printf("barreira 0\n");
+        }
     }
+
+    if (willPassElement(zBefore, zAfter, barrier1)) {
+        bool didCollide = didElementCollideWithElement(ball, barrier1);
+        if (didCollide) {
+            printf("barreira 1\n");
+        }
+    }
+    
+    if (willPassElement(zBefore, zAfter, goalkeeper)) {
+        bool goalkeeperDefended = didElementCollideWithElement(ball, goalkeeper);
+        
+        if (goalkeeperDefended) {
+            printf("Defendeu!\n");
+        } else {
+            printf("Gooooool!\n");
+        }
+    }
+    
 }
 
 void play() {
@@ -317,9 +368,14 @@ void play() {
     drawImage(gameImage);
     frame++;
     
+    if (didBallPassBarrier) {
+//        printf("passou\n");
+    }
+    
+    checkCollisions();
+    
     if (distanceTraveled >= originalDistance) {
-        checkCollisions();
-
+//        checkCollisions();
         changeState(GAME_STATE_AFTER);
     }
 }
@@ -491,10 +547,9 @@ void initElements() {
     field = new Element(imageField, 0, 0);
     goalkeeper = new Element(imageGoalkeeperL, 300, horizontY + 20);
     goalkeeper->setDirection(0);
-    barrier0 = new Element(imageBarrierL0, 100, 180);
-    barrier1 = new Element(imageBarrierR0, 600, 180);
-    ball = new Element(imagesBallsL[0], initialBallX, initialBallY); // TODO melhorar essa bola
-    // TODO
+    barrier0 = new Element(imageBarrierL0, 350, 150, 0.5);
+    barrier1 = new Element(imageBarrierR0, 500, 150, 0.5);
+    ball = new Element(imagesBallsL[0], initialBallX, initialBallY, 0); // TODO melhorar o lugar de inicialização da posicão da bola
 }
 
 void init (void) {
@@ -515,7 +570,7 @@ int main(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB);
     glutInitWindowSize (screenW, screenH);
-    glutInitWindowPosition (300, 100);
+    glutInitWindowPosition (100, 100);
     glutCreateWindow ("Super Mario Soccer");
     init ();
     glutDisplayFunc(display);

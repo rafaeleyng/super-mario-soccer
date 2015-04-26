@@ -19,6 +19,10 @@ int adjustBallX;
 int screenW = 800;
 int screenH = 717;
 
+double t = 0.0;
+
+int ballH;
+
 double originalDistance = 100;
 double currentDistance = originalDistance;
 
@@ -26,9 +30,10 @@ int velocidade = 100;
 int horizontY = 240;
 
 // game state
-const int GAME_STATE_BEFORE = 0;
-const int GAME_STATE_DURING = 1;
-const int GAME_STATE_AFTER = 2;
+const int GAME_STATE_STARTING = 0;
+const int GAME_STATE_BEFORE = 1;
+const int GAME_STATE_DURING = 2;
+const int GAME_STATE_AFTER = 3;
 int GAME_STATE = GAME_STATE_BEFORE;
 
 // options
@@ -89,6 +94,7 @@ void changeState(int newState) {
 
 void startNewGame() {
     currentDistance = originalDistance;
+    t = 0.0;
 }
 
 void resetOptions() {
@@ -262,10 +268,11 @@ void updateDistance() {
 void updateBall() {
     ball->setImage(getBallSprite());
     ball->setX(calcBallX() + adjustBallX);
-    ball->setY(calcBallY());
+    //    ball->setY(calcBallY());
+    ball->setY(ballH);
 }
 
-void play(int value) {
+void play() {
     updateDistance();
     updateBall();
     Image *gameImage = getGameImage();
@@ -300,7 +307,23 @@ void updateGoalkeeper() {
     goalkeeper->setY(horizontY + cos(goalkeeper->getX()/10.) * 10);
 }
 
-void draw(int value) {
+void ballistic(double elapsedTime) {
+    
+    double speed = 100;
+    double angleDeg = 45;
+    double g = 10;
+    
+    double angleRad = angleDeg * (3.14159 / 180.0);
+    double distance = speed * cosf(angleRad) * elapsedTime;
+    
+    double temp = distance / (speed * cos(angleRad));
+    double height = distance * tan(angleRad) - 0.5 * g * (temp * temp);
+    ballH = height + initialBallY;
+    
+    printf("distance: %.2f, height: %.2f\n", distance, height);
+}
+
+void drawGame(int value) {
     updateGoalkeeper();
     
     switch (GAME_STATE) {
@@ -310,6 +333,7 @@ void draw(int value) {
             gameImage->plot(optionsImage, 0, 0);
             drawImage(gameImage);
             
+            // TODO revisar se isso é necessário
             delete gameImage;
             delete optionsImage;
             gameImage = nullptr;
@@ -317,20 +341,24 @@ void draw(int value) {
             break;
         }
         case GAME_STATE_DURING: {
-            play(1);
+            t += 0.2;
+            ballistic(t);
+//            printf("time %.2f\n", t);
+
+            play();
             break;
         }
-        case GAME_STATE_AFTER: {
+        case GAME_STATE_AFTER: {    
             return;
             break;
         }
     }
-    glutTimerFunc(50, draw, 1);
+    glutTimerFunc(50, drawGame, 1);
 }
 
 void display(void) {
     glClear(GL_COLOR_BUFFER_BIT);
-    draw(0);
+    drawGame(0);
 }
 
 void handleOptions(int key) {

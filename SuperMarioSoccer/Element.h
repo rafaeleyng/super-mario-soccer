@@ -16,13 +16,13 @@ class Image;
 
 class Element {
 public:
-    Element(Image *image, double x, double y) {
+    Element(Image *image, int x, int y) {
         this->image = image;
         this->x = x;
         this->y = y;
     }
-    Element(char const *path, double x, double y) : Element(ImageUtil::loadImage(path), x, y) {}
-    Element(double x, double y) {
+    Element(char const *path, int x, int y) : Element(ImageUtil::loadImage(path), x, y) {}
+    Element(int x, int y) {
         this->setImage(NULL);
         this->setX(x);
         this->setY(y);
@@ -34,17 +34,29 @@ public:
     Image* getImage() {
         return this->image;
     }
-    void setX(double x) {
+    void setX(int x) {
         this->x = x;
     }
-    double getX() {
+    int getX() {
         return this->x;
     }
-    void setY(double y) {
+    void setY(int y) {
         this->y = y;
     }
-    double getY() {
+    int getY() {
         return this->y;
+    }
+    int getWidth() {
+        return this->image->getWidth();
+    }
+    int getHeight() {
+        return this->image->getHeight();
+    }
+    int getXEnd() {
+        return this->getX() + this->getWidth();
+    }
+    int getYEnd() {
+        return this->getY() + this->getHeight();
     }
     void plotOn(Image *someImage) {
         someImage->plot(this->getImage(), this->getX(), this->getY());
@@ -58,8 +70,8 @@ public:
     
 private:
     Image *image;
-    double x;
-    double y;
+    int x;
+    int y;
     int direction;
 };
 

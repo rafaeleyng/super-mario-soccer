@@ -174,6 +174,20 @@ int calcBallY() {
     return height;
 }
 
+bool didElementCollideWithElement(Element *e1, Element *e2) {
+    return
+    (
+     (e1->getX() >= e2->getX() && e1->getX() <= e2->getXEnd())
+     || (e1->getXEnd() >= e2->getX() && e1->getXEnd() <= e2->getXEnd())
+     )
+    &&
+    (
+     (e1->getY() >= e2->getY() && e1->getY() <= e2->getYEnd())
+     || (e1->getYEnd() >= e2->getY() && e1->getYEnd() <= e2->getYEnd())
+     )
+    ;
+}
+
 int calcBallX() {
     double lateralDisplacement = getLateralDisplacement();
     double tRatio = 1.0 / (originalDistance / getSpeed());
@@ -267,7 +281,7 @@ void updateBall() {
 }
 
 
-void ballistic(double elapsedTime) {
+void calcBallPosition(double elapsedTime) {
     
     double speed = 100;
     double angleDeg = 45;
@@ -284,9 +298,19 @@ void ballistic(double elapsedTime) {
     printf("distance: %.2f, height: %.2f\n", distance, height);
 }
 
+void checkCollisions() {
+    bool ballInGoalkeeper = didElementCollideWithElement(ball, goalkeeper);
+    
+    if (ballInGoalkeeper) {
+        printf("Defendeu!\n");
+    } else {
+        printf("Gooooool!\n");
+    }
+}
+
 void play() {
     t += 0.2;
-    ballistic(t);
+    calcBallPosition(t);
 
     updateBall();
     Image *gameImage = getGameImage();
@@ -294,6 +318,8 @@ void play() {
     frame++;
     
     if (distanceTraveled >= originalDistance) {
+        checkCollisions();
+
         changeState(GAME_STATE_AFTER);
     }
 }
@@ -323,6 +349,8 @@ void updateGoalkeeper() {
 
 void drawGame(int value) {
     updateGoalkeeper();
+//    printf("width: %d, height: %d\n", ball->getWidth(), ball->getHeight());
+    
     
     switch (GAME_STATE) {
         case GAME_STATE_BEFORE: {
@@ -339,8 +367,6 @@ void drawGame(int value) {
             break;
         }
         case GAME_STATE_DURING: {
-//            printf("time %.2f\n", t);
-
             play();
             break;
         }

@@ -21,6 +21,7 @@ int screenW = 800;
 int screenH = 717;
 
 bool didBallPassBarrier;
+bool isGoal;
 
 double t = 0.0;
 
@@ -82,12 +83,17 @@ Image *imagesBallsL[numberOfBalls];
 Image *imagesBallsM[numberOfBalls];
 Image *imagesBallsS[numberOfBalls];
 
+Image *imageGoalText;
+Image *imageMissText;
+
 // elements
 Element *field;
 Element *goalkeeper;
 Element *barrier0;
 Element *barrier1;
 Element *ball;
+Element *goalText;
+Element *missText;
 
 void changeState(int newState) {
     printf("state: %d\n", newState);
@@ -102,6 +108,7 @@ void startNewGame() {
     // TODO resetar direit a bola, não está funcionando
     ball->setX(initialBallX);
     ball->setY(initialBallY);
+    isGoal = false;
 }
 
 void resetOptions() {
@@ -326,8 +333,7 @@ bool willPassElement(double zBefore, double zAfter, Element *element) {
     return zBefore < element->getZPosition() && zAfter >= element->getZPosition();
 }
 
-void checkCollisions() {
-    
+bool checkCollisions() {
     double zBefore = ball->getZPosition();
     ball->setZPosition(distanceTraveled / originalDistance);
     didBallPassBarrier = ball->getZPosition() >= barrier0->getZPosition();
@@ -337,6 +343,7 @@ void checkCollisions() {
         bool didCollide = didElementCollideWithElement(ball, barrier0);
         if (didCollide) {
             printf("barreira 0\n");
+            return true;
         }
     }
 
@@ -344,19 +351,19 @@ void checkCollisions() {
         bool didCollide = didElementCollideWithElement(ball, barrier1);
         if (didCollide) {
             printf("barreira 1\n");
+            return true;
         }
     }
     
     if (willPassElement(zBefore, zAfter, goalkeeper)) {
-        bool goalkeeperDefended = didElementCollideWithElement(ball, goalkeeper);
-        
-        if (goalkeeperDefended) {
+        bool didCollide = didElementCollideWithElement(ball, goalkeeper);
+        if (didCollide) {
             printf("Defendeu!\n");
-        } else {
-            printf("Gooooool!\n");
+            return true;
         }
     }
     
+    return false;
 }
 
 void play() {
@@ -372,11 +379,19 @@ void play() {
 //        printf("passou\n");
     }
     
-    checkCollisions();
+    bool didCollide = checkCollisions();
+    
+    if (didCollide) {
+        isGoal = false;
+        changeState(GAME_STATE_AFTER);
+        return;
+    }
     
     if (distanceTraveled >= originalDistance) {
-//        checkCollisions();
+        // TODO verificar se entrou na goleira
+        isGoal = true;
         changeState(GAME_STATE_AFTER);
+        return;
     }
 }
 
@@ -426,7 +441,14 @@ void drawGame(int value) {
             play();
             break;
         }
-        case GAME_STATE_AFTER: {    
+        case GAME_STATE_AFTER: {
+            Image *gameImage = getGameImage();
+            if (isGoal) {
+                goalText->plotOn(gameImage);
+            } else {
+                missText->plotOn(gameImage);
+            }
+            drawImage(gameImage);
             return;
             break;
         }
@@ -541,6 +563,10 @@ void initImages() {
     imagesBallsS[1] = ImageUtil::loadImage("ballS/ball1.ptm");
     imagesBallsS[2] = ImageUtil::loadImage("ballS/ball2.ptm");
     imagesBallsS[3] = ImageUtil::loadImage("ballS/ball3.ptm");
+    
+    // banners
+    imageGoalText = ImageUtil::loadImage("text/goal.ptm");
+    imageMissText = ImageUtil::loadImage("text/miss.ptm");
 }
 
 void initElements() {
@@ -550,6 +576,9 @@ void initElements() {
     barrier0 = new Element(imageBarrierL0, 350, 150, 0.5);
     barrier1 = new Element(imageBarrierR0, 500, 150, 0.5);
     ball = new Element(imagesBallsL[0], initialBallX, initialBallY, 0); // TODO melhorar o lugar de inicialização da posicão da bola
+    
+    goalText = new Element(imageGoalText, 280, 500);
+    missText = new Element(imageMissText, 280, 500);
 }
 
 void init (void) {

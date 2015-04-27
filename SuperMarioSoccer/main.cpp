@@ -34,7 +34,7 @@ double distanceStep;
 int const horizontY = 240;
 int const initialBallX = 360;
 int const initialBallY = 90;
-int ballX = initialBallX;
+int ballX;
 
 // game state
 const int GAME_STATE_STARTING = 0;
@@ -105,10 +105,11 @@ void startNewGame() {
     distanceTraveled = 0;
     t = 0.0;
     didBallPassBarrier = false;
-    // TODO resetar direit a bola, não está funcionando
+    // TODO resetar direito a bola, não está funcionando
     ball->setX(initialBallX);
     ball->setY(initialBallY);
     isGoal = false;
+    ballX = initialBallX;
 }
 
 void resetOptions() {
@@ -118,83 +119,26 @@ void resetOptions() {
 }
 
 double getSpeed() {
-    int optionValue = OPTIONS_VALUES[OPTION_STRENGTH];
-    if (optionValue == 0) {
-        return 1.0;
-    }
-    if (optionValue == 1) {
-        return 2.0;
-    }
-    return 3.0;
+    double values[3] = {80.0, 90.0, 100.0};
+    return values[OPTIONS_VALUES[OPTION_STRENGTH]];
 }
 
 double getAngle() {
-    int optionValue = OPTIONS_VALUES[OPTION_HEIGHT];
-    if (optionValue == 0) {
-        return 30;
-    }
-    if (optionValue == 1) {
-        return 45;
-    }
-    return 60;
+    double values[3] = {15.0, 30.0, 45.0};
+    return values[OPTIONS_VALUES[OPTION_HEIGHT]];
 }
 
 double getLateralDisplacement() {
-    int optionValue = OPTIONS_VALUES[OPTION_DIRECTION];
     double displacement = 130.0;
-    if (optionValue == 0) {
-        return - displacement;
-    }
-    if (optionValue == 1) {
-        return 0;
-    }
-    return displacement;
+    double values[3] = {-displacement, 0.0, displacement};
+    return values[OPTIONS_VALUES[OPTION_DIRECTION]];
 }
-
-//int calcBallY() {
-    // TODO implementar a balística de verdade
-    //    double x, y, g = 9.8;
-    //    double angulo = 30.0;
-    //    double a = angulo / 180 * PI;
-    //    x = velocidade * cos(a) * t;
-    //    y = v * sin(a) * ( (x / velocidade) * cos(a) ) - ( (g*x*x) / 2*(v*v * cos(a) * cos(a) ) );
-    //    t += 0.1;
-    
-    // TODO essa implementação é fake
-//    double startHeight = initialBallY;
-//    double heightToGain = 300.;
-//    double minHeightOnFall = horizontY;
-//    double heightRatio;
-//    double halfDistance = originalDistance / 2;
-//    double height;
-//    
-//    // subida
-//    if (distanceTraveled < halfDistance) {
-//        heightRatio = distanceTraveled / halfDistance;
-//        height = heightRatio * heightToGain;
-//        height += startHeight;
-//    }
-//    // queda
-//    else {
-//        heightRatio = (originalDistance - distanceTraveled) / halfDistance;
-//        
-//        double originalRange = heightToGain;
-//        double fallRange = (startHeight + heightToGain) - minHeightOnFall;
-//        heightRatio = (heightRatio / originalRange) * fallRange;
-//        
-//        height = heightRatio * heightToGain;
-//        height += minHeightOnFall;
-//        
-//    }
-//    
-//    return height;
-//}
 
 int calcBallX() {
     double lateralDisplacement = getLateralDisplacement();
-    double tRatio = 1.0 / (originalDistance / getSpeed());
-    double howMuchToDisplace = tRatio * lateralDisplacement;
-    ballX += howMuchToDisplace;
+    double prop =(distanceTraveled / originalDistance);
+    double howMuchToDisplace = prop * lateralDisplacement;
+    ballX = initialBallX + howMuchToDisplace;
     return ballX;
 }
 
@@ -286,7 +230,9 @@ void updateBall() {
     // sprite
     ball->setImage(getBallSprite());
     // x
-    ball->setX(calcBallX() + adjustBallX);
+    int ballXLocal = calcBallX();
+    int ballAdjustX = adjustBallX;
+    ball->setX(ballXLocal + ballAdjustX);
     // y
     adjustBallY = (distanceTraveled / originalDistance) * horizontY;
     int height = ballH + adjustBallY;
@@ -296,8 +242,8 @@ void updateBall() {
 
 void calcBallPosition(double elapsedTime) {
     
-    double speed = 80;
-    double angleDeg = 40;
+    double speed = getSpeed();
+    double angleDeg = getAngle();
     double g = 10;
     
     double angleRad = angleDeg * (3.14159 / 180.0);
@@ -374,10 +320,6 @@ void play() {
     Image *gameImage = getGameImage();
     drawImage(gameImage);
     frame++;
-    
-    if (didBallPassBarrier) {
-//        printf("passou\n");
-    }
     
     bool didCollide = checkCollisions();
     

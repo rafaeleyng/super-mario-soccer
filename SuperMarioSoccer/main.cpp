@@ -107,17 +107,17 @@ void startNewGame() {
     distanceTraveled = 0;
     t = 0.0;
     didBallPassBarrier = false;
-    // TODO resetar direito a bola, não está funcionando
+
     ball->setX(initialBallX);
     ball->setY(initialBallY);
+    ball->setImage(imagesBallsL[0]);
+    
     isGoal = false;
     ballX = initialBallX;
     
     srand(time(NULL));
     barrier0->setX((rand() % 180) + 180);
     barrier1->setX((rand() % 180) + 370);
-//    barrier0 = new Element(imageBarrierL0, , 150, 0.5);
-//    barrier1 = new Element(imageBarrierR0, , 150, 0.5);
 
 }
 
@@ -445,7 +445,6 @@ void keyboard(unsigned char key, int x, int y) {
 //                    glutPostRedisplay();
                     break;
                 case KEY_KICK:
-                    startNewGame();
                     changeState(GAME_STATE_DURING);
 //                    glutPostRedisplay();
                     break;
@@ -459,6 +458,7 @@ void keyboard(unsigned char key, int x, int y) {
                     break;
                 case 'r':
                 case 'R':
+                    startNewGame();
                     changeState(GAME_STATE_BEFORE);
                     glutPostRedisplay();
             }
@@ -542,6 +542,8 @@ void init (void) {
     
     initImages();
     initElements();
+    startNewGame();
+
 }
 
 int main(int argc, char** argv) {

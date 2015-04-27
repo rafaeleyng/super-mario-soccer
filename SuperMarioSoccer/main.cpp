@@ -26,9 +26,7 @@ bool didBallPassBarrier;
 bool isGoal;
 
 double t = 0.0;
-
 double originalDistance = 700;
-
 double ballH;
 double distanceTraveled;
 double distanceStep;
@@ -37,6 +35,12 @@ int const horizontY = 240;
 int const initialBallX = 360;
 int const initialBallY = 90;
 int ballX;
+
+// goal
+double goalTop = 420;
+double goalRight = 585;
+double goalBottom = 240;
+double goalLeft = 220;
 
 // game state
 const int GAME_STATE_STARTING = 0;
@@ -60,6 +64,8 @@ const int KEY_UP = 119; // w
 const int KEY_RIGHT = 100; // d
 const int KEY_DOWN = 115; // s
 const int KEY_LEFT = 97; // a
+
+
 
 // images
 Image *arrow;
@@ -321,6 +327,20 @@ bool checkCollisions() {
     return false;
 }
 
+bool didHitGoal() {
+    return
+    (
+     (ball->getX() >= goalLeft && ball->getX() <= goalRight)
+     || (ball->getXEnd() >= goalLeft && ball->getXEnd() <= goalRight)
+     )
+    &&
+    (
+     (ball->getY() >= goalBottom && ball->getY() <= goalTop)
+     || (ball->getYEnd() >= goalBottom && ball->getYEnd() <= goalTop)
+     )
+    ;
+}
+
 void play() {
     t += 0.2;
     calcBallPosition(t);
@@ -339,15 +359,12 @@ void play() {
     }
     
     if (distanceTraveled >= originalDistance) {
-        // TODO verificar se entrou na goleira
-        isGoal = true;
+        isGoal = didHitGoal();
         changeState(GAME_STATE_AFTER);
         return;
     }
 }
 
-double goalLeft = 220;
-double goalRight = 590;
 void updateGoalkeeper() {
     int goalkeeperStep = 4;
     if (goalkeeper->getDirection() == 0) {

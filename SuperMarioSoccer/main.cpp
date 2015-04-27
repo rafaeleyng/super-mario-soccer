@@ -11,6 +11,8 @@
 #include "ImageUtil.h"
 #include "Image.h"
 #include "Element.h"
+#include <time.h>
+
 
 #define PI 3.1415926535898
 
@@ -110,6 +112,13 @@ void startNewGame() {
     ball->setY(initialBallY);
     isGoal = false;
     ballX = initialBallX;
+    
+    srand(time(NULL));
+    barrier0->setX((rand() % 180) + 180);
+    barrier1->setX((rand() % 180) + 370);
+//    barrier0 = new Element(imageBarrierL0, , 150, 0.5);
+//    barrier1 = new Element(imageBarrierR0, , 150, 0.5);
+
 }
 
 void resetOptions() {
@@ -340,7 +349,7 @@ void play() {
 double goalLeft = 220;
 double goalRight = 590;
 void updateGoalkeeper() {
-    int goalkeeperStep = 5;
+    int goalkeeperStep = 4;
     if (goalkeeper->getDirection() == 0) {
         if (goalkeeper->getX() > goalLeft) {
             goalkeeper->setX(goalkeeper->getX() - goalkeeperStep);
@@ -357,13 +366,11 @@ void updateGoalkeeper() {
         }
     }
     // faz o swing vertical
-    goalkeeper->setY(horizontY + cos(goalkeeper->getX()/10.) * 10);
+    goalkeeper->setY((horizontY + 25) + cos(goalkeeper->getX()/10.) * 20);
 }
 
 void drawGame(int value) {
     updateGoalkeeper();
-//    printf("width: %d, height: %d\n", ball->getWidth(), ball->getHeight());
-    
     
     switch (GAME_STATE) {
         case GAME_STATE_BEFORE: {
@@ -515,8 +522,8 @@ void initElements() {
     field = new Element(imageField, 0, 0);
     goalkeeper = new Element(imageGoalkeeperL, 300, horizontY + 20);
     goalkeeper->setDirection(0);
-    barrier0 = new Element(imageBarrierL0, 350, 150, 0.5);
-    barrier1 = new Element(imageBarrierR0, 500, 150, 0.5);
+    barrier0 = new Element(imageBarrierL0, 0, 150, 0.5);
+    barrier1 = new Element(imageBarrierR0, 0, 150, 0.5);
     ball = new Element(imagesBallsL[0], initialBallX, initialBallY, 0); // TODO melhorar o lugar de inicialização da posicão da bola
     
     goalText = new Element(imageGoalText, 280, 500);
